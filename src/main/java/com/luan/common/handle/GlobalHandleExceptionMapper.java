@@ -10,7 +10,7 @@ import jakarta.ws.rs.ext.Provider;
 import lombok.SneakyThrows;
 
 @Provider
-public class GlobalHandleException implements ExceptionMapper<Exception>, HandleExceptionMapper {
+public class GlobalHandleExceptionMapper implements ExceptionMapper<Exception>, HandleExceptionMapper {
 
     @Context
     HttpServerRequest request;
@@ -24,7 +24,7 @@ public class GlobalHandleException implements ExceptionMapper<Exception>, Handle
 
 
     public String getTitle() {
-        return "Internal Server Error";
+        return HttpResponseStatus.INTERNAL_SERVER_ERROR.reasonPhrase();
     }
 
     public int getStatus() {
@@ -32,4 +32,3 @@ public class GlobalHandleException implements ExceptionMapper<Exception>, Handle
     }
 
 }
-

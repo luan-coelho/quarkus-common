@@ -1,8 +1,8 @@
 package com.luan.common.handle;
 
-import com.luan.common.handle.rest.response.ErrorResponse;
 import com.luan.common.exception.AuthenticationException;
 import com.luan.common.exception.UnauthorizedException;
+import com.luan.common.handle.rest.response.ErrorResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpServerRequest;
 import jakarta.ws.rs.core.Context;
@@ -22,23 +22,17 @@ public class AuthenticationExceptionMapper implements ExceptionMapper<Authentica
     @Override
     public Response toResponse(AuthenticationException exception) {
         ErrorResponse errorResponse = buildResponse(exception, request);
-        if (exception instanceof UnauthorizedException) {
-            errorResponse.setTitle("Unauthorized");
-            errorResponse.setStatus(HttpResponseStatus.UNAUTHORIZED.code());
-        }
         return Response.status(errorResponse.getStatus()).entity(errorResponse).build();
     }
 
     @Override
     public String getTitle() {
-        return "Authentication failed";
+        return HttpResponseStatus.UNAUTHORIZED.reasonPhrase();
     }
 
     @Override
     public int getStatus() {
-        return HttpResponseStatus.BAD_REQUEST.code();
+        return HttpResponseStatus.UNAUTHORIZED.code();
     }
 
 }
-
-    

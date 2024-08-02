@@ -26,7 +26,7 @@ public class NotFoundExceptionMapper implements ExceptionMapper<NotFoundExceptio
 
     @Override
     public String getTitle() {
-        return "Not Found";
+        return HttpResponseStatus.NOT_FOUND.reasonPhrase();
     }
 
     @Override
@@ -35,5 +35,3 @@ public class NotFoundExceptionMapper implements ExceptionMapper<NotFoundExceptio
     }
 
 }
-
-    

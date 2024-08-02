@@ -25,7 +25,7 @@ public class IllegalArgumentExceptionMapper implements ExceptionMapper<IllegalAr
 
     @Override
     public String getTitle() {
-        return "Validation Failed";
+        return HttpResponseStatus.BAD_REQUEST.reasonPhrase();
     }
 
     @Override
@@ -34,5 +34,3 @@ public class IllegalArgumentExceptionMapper implements ExceptionMapper<IllegalAr
     }
 
 }
-
-    
