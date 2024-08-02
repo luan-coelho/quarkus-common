@@ -1,4 +1,4 @@
-package com.luan.common.handle.restresponse;
+package com.luan.common.exception;
 
 public class AuthenticationException extends RuntimeException {
 

@@ -1,6 +1,6 @@
 package com.luan.common.handle;
 
-import com.luan.common.exception.ErrorResponse;
+import com.luan.common.handle.rest.response.ErrorResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpServerRequest;
 import jakarta.ws.rs.NotFoundException;

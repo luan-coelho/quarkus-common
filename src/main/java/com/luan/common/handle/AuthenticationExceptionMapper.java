@@ -1,8 +1,8 @@
 package com.luan.common.handle;
 
-import com.luan.common.exception.ErrorResponse;
-import com.luan.common.handle.restresponse.AuthenticationException;
-import com.luan.common.handle.restresponse.UnauthorizedException;
+import com.luan.common.handle.rest.response.ErrorResponse;
+import com.luan.common.exception.AuthenticationException;
+import com.luan.common.exception.UnauthorizedException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpServerRequest;
 import jakarta.ws.rs.core.Context;

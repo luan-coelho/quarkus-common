@@ -1,7 +1,7 @@
 package com.luan.common.mapper;
 
-import com.luan.common.exception.ErrorResponse;
-import com.luan.common.handle.restresponse.ValidationErrorResponse;
+import com.luan.common.handle.rest.response.ErrorResponse;
+import com.luan.common.handle.rest.response.ValidationErrorResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 

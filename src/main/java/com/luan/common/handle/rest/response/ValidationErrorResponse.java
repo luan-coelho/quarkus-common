@@ -1,6 +1,5 @@
-package com.luan.common.handle.restresponse;
+package com.luan.common.handle.rest.response;
 
-import com.luan.common.exception.ErrorResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,4 @@
-package com.luan.common.exception;
+package com.luan.common.handle.rest.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
