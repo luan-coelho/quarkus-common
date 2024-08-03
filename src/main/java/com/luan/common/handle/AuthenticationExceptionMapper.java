@@ -5,6 +5,7 @@ import com.luan.common.exception.UnauthorizedException;
 import com.luan.common.handle.rest.response.ErrorResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpServerRequest;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
@@ -13,6 +14,7 @@ import lombok.SneakyThrows;
 
 @SuppressWarnings("unused")
 @Provider
+@ApplicationScoped
 public class AuthenticationExceptionMapper implements ExceptionMapper<AuthenticationException>, HandleExceptionMapper {
 
     @Context

@@ -3,6 +3,7 @@ package com.luan.common.handle;
 import com.luan.common.handle.rest.response.ErrorResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpServerRequest;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
@@ -12,6 +13,7 @@ import lombok.SneakyThrows;
 
 @SuppressWarnings("unused")
 @Provider
+@ApplicationScoped
 public class NotFoundExceptionMapper implements ExceptionMapper<NotFoundException>, HandleExceptionMapper {
 
     @Context

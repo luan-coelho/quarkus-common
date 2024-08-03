@@ -3,6 +3,7 @@ package com.luan.common.handle;
 import com.luan.common.handle.rest.response.ErrorResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.http.HttpServerRequest;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
@@ -10,6 +11,7 @@ import jakarta.ws.rs.ext.Provider;
 import lombok.SneakyThrows;
 
 @Provider
+@ApplicationScoped
 public class GlobalHandleExceptionMapper implements ExceptionMapper<Exception>, HandleExceptionMapper {
 
     @Context
