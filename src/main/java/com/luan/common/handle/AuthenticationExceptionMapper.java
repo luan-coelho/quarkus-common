@@ -1,31 +1,14 @@
 package com.luan.common.handle;
 
 import com.luan.common.exception.AuthenticationException;
-import com.luan.common.exception.UnauthorizedException;
-import com.luan.common.handle.rest.response.ErrorResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.vertx.core.http.HttpServerRequest;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-import lombok.SneakyThrows;
 
-@SuppressWarnings("unused")
 @Provider
 @ApplicationScoped
-public class AuthenticationExceptionMapper implements ExceptionMapper<AuthenticationException>, HandleExceptionMapper {
-
-    @Context
-    HttpServerRequest request;
-
-    @SneakyThrows
-    @Override
-    public Response toResponse(AuthenticationException exception) {
-        ErrorResponse errorResponse = buildResponse(exception, request);
-        return Response.status(errorResponse.getStatus()).entity(errorResponse).build();
-    }
+public class AuthenticationExceptionMapper extends HandleExceptionMapper<AuthenticationException> implements ExceptionMapper<AuthenticationException> {
 
     @Override
     public String getTitle() {

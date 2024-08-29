@@ -1,4 +1,0 @@
-com.luan.common.handle.GlobalHandleExceptionMapper
-com.luan.common.handle.AuthenticationExceptionMapper
-com.luan.common.handle.IllegalArgumentExceptionMapper
-com.luan.common.handle.NotFoundExceptionMapper
