@@ -1,14 +1,13 @@
 package com.luan.common.handle;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 
 @Provider
-@ApplicationScoped
-public class NotFoundExceptionMapper extends HandleExceptionMapper<NotFoundException> implements ExceptionMapper<NotFoundException> {
+public class NotFoundExceptionMapper extends HandleExceptionMapper<NotFoundException>
+        implements ExceptionMapper<NotFoundException> {
 
     @Override
     public String getTitle() {

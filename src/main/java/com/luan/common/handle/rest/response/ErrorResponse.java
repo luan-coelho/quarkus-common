@@ -1,20 +1,19 @@
 package com.luan.common.handle.rest.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@SuperBuilder
 public class ErrorResponse {
 
     private String type;
     private String title;
     private int status;
-    private Object detail;
+    private String detail;
     private String instance;
 
 }

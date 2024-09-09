@@ -2,13 +2,12 @@ package com.luan.common.handle;
 
 import com.luan.common.exception.AuthenticationException;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 
 @Provider
-@ApplicationScoped
-public class AuthenticationExceptionMapper extends HandleExceptionMapper<AuthenticationException> implements ExceptionMapper<AuthenticationException> {
+public class AuthenticationExceptionMapper extends HandleExceptionMapper<AuthenticationException>
+        implements ExceptionMapper<AuthenticationException> {
 
     @Override
     public String getTitle() {
