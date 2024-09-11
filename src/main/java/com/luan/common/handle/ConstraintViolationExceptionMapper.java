@@ -1,6 +1,7 @@
 package com.luan.common.handle;
 
 import com.luan.common.handle.rest.response.ConstraintErrorResponse;
+import com.luan.common.handle.rest.response.ErrorResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.core.Response;
@@ -21,9 +22,11 @@ public class ConstraintViolationExceptionMapper extends HandleExceptionMapper<Co
         return HttpResponseStatus.BAD_REQUEST.code();
     }
 
+    @Override
     public Response toResponse(ConstraintViolationException exception) {
-        ConstraintErrorResponse errorResponse = (ConstraintErrorResponse) buildResponse(exception, request);
-        errorResponse.addErrors(exception.getConstraintViolations());
+        ErrorResponse errorResponse = buildResponse(exception, request);
+        ConstraintErrorResponse constraintErrorResponse = ((ConstraintErrorResponse) errorResponse);
+//        errorResponse.addErrors(exception.getConstraintViolations());
         return Response.status(errorResponse.getStatus()).entity(errorResponse).build();
     }
 

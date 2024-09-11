@@ -1,5 +1,6 @@
-package com.luan.common.handle;
+package com.luan.common.resource;
 
+import com.luan.common.model.Car;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;

@@ -15,6 +15,14 @@ public class ConstraintErrorResponse extends ErrorResponse {
 
     private Map<String, List<String>> errors;
 
+    public ConstraintErrorResponse(ErrorResponse errorResponse) {
+        this.setType(errorResponse.getType());
+        this.setTitle(errorResponse.getTitle());
+        this.setStatus(errorResponse.getStatus());
+        this.setDetail(errorResponse.getDetail());
+        this.setInstance(errorResponse.getInstance());
+    }
+
     public void addError(String field, String errorMessage) {
         if (this.errors == null) {
             this.errors = new HashMap<>();
