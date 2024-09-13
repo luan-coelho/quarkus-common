@@ -10,6 +10,4 @@ public interface ErrorResponseMapper {
 
     ConstraintErrorResponse copyProperties(ErrorResponse errorResponse);
 
-    ConstraintErrorResponse copyProperties(ConstraintErrorResponse errorResponse);
-
 }

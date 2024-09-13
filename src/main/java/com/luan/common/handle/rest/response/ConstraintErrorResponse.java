@@ -4,8 +4,12 @@ import jakarta.validation.ConstraintViolation;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serial;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
+@EqualsAndHashCode(callSuper = false)
 @Setter
 @Getter
 @AllArgsConstructor
@@ -13,15 +17,10 @@ import java.util.*;
 @SuperBuilder
 public class ConstraintErrorResponse extends ErrorResponse {
 
-    private Map<String, List<String>> errors;
+    @Serial
+    private static final long serialVersionUID = 1778598015378290270L;
 
-    public ConstraintErrorResponse(ErrorResponse errorResponse) {
-        this.setType(errorResponse.getType());
-        this.setTitle(errorResponse.getTitle());
-        this.setStatus(errorResponse.getStatus());
-        this.setDetail(errorResponse.getDetail());
-        this.setInstance(errorResponse.getInstance());
-    }
+    private Map<String, List<String>> errors;
 
     public void addError(String field, String errorMessage) {
         if (this.errors == null) {
@@ -42,8 +41,11 @@ public class ConstraintErrorResponse extends ErrorResponse {
         }
 
         constraintViolations.forEach(constraintViolation -> {
-            String field = constraintViolation.getPropertyPath().toString();
+            String field = String.valueOf(StreamSupport.stream(constraintViolation
+                    .getPropertyPath()
+                    .spliterator(), false).reduce((first, second) -> second).orElse(null));
             String errorMessage = constraintViolation.getMessage();
+
             if (this.errors.containsKey(field)) {
                 this.errors.get(field).add(errorMessage);
             } else {
