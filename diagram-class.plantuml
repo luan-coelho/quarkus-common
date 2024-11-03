@@ -1,0 +1,86 @@
+@startuml
+
+class Usuario {
+    -nome: String
+    -email: String
+    -cpf: String
+    -senha: String
+    -endereco: Endereco
+    -telefonePrincipal: String
+    -telefoneSecundario: String
+}
+
+class Endereco {
+    -cep: String
+    -rua: String
+    -cidade: String
+    -estado: String
+    -numero: String
+    -complemento: String
+}
+
+class Empresa {
+    -nome: String
+    -cnpj: String
+    -inscricaoEstadual: String
+    -razaoSocial: String
+    -funcionarios: List<Funcionario>
+    -configuracao: ConfiguracaoEmpresa
+}
+
+class ConfiguracaoEmpresa {
+    -horarioFuncionamento: List<HorarioPorDiaSemana>
+}
+
+class HorarioPorDiaSemana {
+    -diaSemana: DiaSemana
+    -inicio: LocalTime
+    -fim: LocalTime
+}
+
+enum DiaSemana {
+    +SEGUNDA
+    +TERCA
+    +QUARTA
+    +QUINTA
+    +SEXTA
+    +SABADO
+}
+
+class Administrador {
+}
+
+class Funcionario {
+    - excessoesHorario: List<HorarioUso>
+}
+
+class HorarioUso {
+    -data: LocalDate
+    -inicio: LocalTime
+    -fim: LocalTime
+}
+
+class Gerente {
+}
+
+class FuncionarioOperacional {
+}
+
+class UsuarioExterno {
+}
+
+Administrador "1" --> "1" Usuario
+UsuarioExterno "1" --> "1" Usuario
+Usuario "*" --> "1" Endereco
+AdministradorEmpresa "1" --> "1" Usuario
+Empresa "1" --> "1" AdministradorEmpresa
+Empresa "1" --> "*" Funcionario
+Empresa "1" --> "1" ConfiguracaoEmpresa
+ConfiguracaoEmpresa "1" --> "1" HorarioPorDiaSemana
+HorarioPorDiaSemana "1" --> "1" DiaSemana
+Funcionario <|-- Gerente
+Funcionario <|-- FuncionarioOperacional
+Funcionario "1" --> "1" HorarioUso
+Funcionario "1" --> "1" Usuario
+
+@enduml
