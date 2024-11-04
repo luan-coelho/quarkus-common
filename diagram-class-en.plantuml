@@ -1,0 +1,79 @@
+@startuml
+
+class User {
+    -name: String
+    -email: String
+    -cpf: String
+    -password: String
+    -address: Address
+    -primaryPhone: String
+    -secondaryPhone: String
+}
+
+class Address {
+    -zipCode: String
+    -street: String
+    -city: String
+    -state: String
+    -number: String
+    -complement: String
+}
+
+class Company {
+    -name: String
+    -cnpj: String
+    -stateRegistration: String
+    -corporateName: String
+    -employees: List<Employee>
+    -configuration: CompanyConfiguration
+}
+
+/'
+class CompanyConfiguration {
+    -workingHours: List<ScheduleByDayOfWeek>
+}
+
+class ScheduleByDayOfWeek {
+    -dayOfWeek: DayOfWeek
+    -start: LocalTime
+    -end: LocalTime
+}
+
+enum DayOfWeek {
+    +MONDAY
+    +TUESDAY
+    +WEDNESDAY
+    +THURSDAY
+    +FRIDAY
+    +SATURDAY
+}
+'/
+
+class Administrator {
+}
+
+class Employee {
+}
+
+class Manager {
+}
+
+class OperationalEmployee {
+}
+
+class ExternalUser {
+}
+
+Administrator "1" --> "1" User
+ExternalUser "1" --> "1" User
+User "*" --> "1" Address
+CompanyAdministrator "1" --> "1" User
+Company "1" --> "1" CompanyAdministrator
+Company "1" --> "*" Employee
+Employee <|-- Manager
+Employee <|-- OperationalEmployee
+Employee "1" --> "1" User
+' Company "1" --> "1" CompanyConfiguration
+' Employee "1" --> "1" ScheduleUsage
+
+@enduml

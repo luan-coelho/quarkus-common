@@ -28,6 +28,7 @@ class Empresa {
     -configuracao: ConfiguracaoEmpresa
 }
 
+/'
 class ConfiguracaoEmpresa {
     -horarioFuncionamento: List<HorarioPorDiaSemana>
 }
@@ -45,20 +46,16 @@ enum DiaSemana {
     +QUINTA
     +SEXTA
     +SABADO
-}
+} 
+'/
 
 class Administrador {
 }
 
 class Funcionario {
-    - excessoesHorario: List<HorarioUso>
+    
 }
 
-class HorarioUso {
-    -data: LocalDate
-    -inicio: LocalTime
-    -fim: LocalTime
-}
 
 class Gerente {
 }
@@ -75,12 +72,10 @@ Usuario "*" --> "1" Endereco
 AdministradorEmpresa "1" --> "1" Usuario
 Empresa "1" --> "1" AdministradorEmpresa
 Empresa "1" --> "*" Funcionario
-Empresa "1" --> "1" ConfiguracaoEmpresa
-ConfiguracaoEmpresa "1" --> "1" HorarioPorDiaSemana
-HorarioPorDiaSemana "1" --> "1" DiaSemana
 Funcionario <|-- Gerente
 Funcionario <|-- FuncionarioOperacional
-Funcionario "1" --> "1" HorarioUso
 Funcionario "1" --> "1" Usuario
+' Empresa "1" --> "1" ConfiguracaoEmpresa
+' Funcionario "1" --> "1" HorarioUso
 
 @enduml
