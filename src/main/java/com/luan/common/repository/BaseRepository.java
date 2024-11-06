@@ -11,17 +11,16 @@ import io.quarkus.panache.common.Page;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class BaseRepository<T extends BaseEntity> implements PanacheRepositoryBase<T, UUID> {
+public abstract class BaseRepository<T extends BaseEntity> implements PanacheRepositoryBase<T, UUID>,
+        DataServiceRepository {
 
     public DataPagination<T> findAll(Pageable pageable) {
         PanacheQuery<T> panacheQuery = findAll();
         return buildDataPagination(pageable, panacheQuery);
     }
 
-    private Pagination buildPaginationFromPageable(Pageable pageable, PanacheQuery<T> panacheQuery) {
-        long totalItems = panacheQuery.count();
-        long totalPages = (long) Math.ceil((double) totalItems / pageable.getSize());
-        return new Pagination(pageable.getPage(), totalPages, totalItems);
+    public boolean existsById(UUID id) {
+        return count("id", id) > 0;
     }
 
     protected DataPagination<T> buildDataPagination(Pageable pageable, PanacheQuery<T> panacheQuery) {
@@ -31,8 +30,10 @@ public abstract class BaseRepository<T extends BaseEntity> implements PanacheRep
         return new DataPagination<>(list, pagination);
     }
 
-    public boolean existsById(UUID id) {
-        return findByIdOptional(id).isPresent();
+    private Pagination buildPaginationFromPageable(Pageable pageable, PanacheQuery<T> panacheQuery) {
+        long totalItems = panacheQuery.count();
+        long totalPages = (long) Math.ceil((double) totalItems / pageable.getSize());
+        return new Pagination(pageable.getPage(), totalPages, totalItems);
     }
 
 }
