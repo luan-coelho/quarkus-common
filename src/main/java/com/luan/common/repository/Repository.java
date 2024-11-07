@@ -9,25 +9,23 @@ import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Page;
 
 import java.util.List;
-import java.util.UUID;
 
-public abstract class BaseRepository<T extends BaseEntity> implements PanacheRepositoryBase<T, UUID>,
-        DataServiceRepository {
+public interface Repository<T extends BaseEntity, UUID> extends PanacheRepositoryBase<T, UUID> {
 
-    public DataPagination<T> findAll(Pageable pageable) {
+    default DataPagination<T> findAll(Pageable pageable) {
         PanacheQuery<T> panacheQuery = findAll();
         return buildDataPagination(pageable, panacheQuery);
     }
 
-    public boolean existsById(UUID id) {
-        return count("id", id) > 0;
-    }
-
-    protected DataPagination<T> buildDataPagination(Pageable pageable, PanacheQuery<T> panacheQuery) {
+    default DataPagination<T> buildDataPagination(Pageable pageable, PanacheQuery<T> panacheQuery) {
         Pagination pagination = buildPaginationFromPageable(pageable, panacheQuery);
         panacheQuery.page(Page.of(pageable.getPage(), pageable.getSize()));
         List<T> list = panacheQuery.list();
         return new DataPagination<>(list, pagination);
+    }
+
+    default boolean existsById(UUID id) {
+        return count("id", id) > 0;
     }
 
     private Pagination buildPaginationFromPageable(Pageable pageable, PanacheQuery<T> panacheQuery) {
@@ -37,4 +35,3 @@ public abstract class BaseRepository<T extends BaseEntity> implements PanacheRep
     }
 
 }
-
