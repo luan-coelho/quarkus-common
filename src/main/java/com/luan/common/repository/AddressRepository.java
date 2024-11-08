@@ -6,7 +6,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.UUID;
 
 @ApplicationScoped
-public class AddressRepository implements Repository<Address, UUID> {
+public class AddressRepository extends Repository<Address, UUID> {
 
 
 }

@@ -7,6 +7,10 @@ import java.util.UUID;
 
 public class AddressService extends BaseService<Address, UUID, AddressRepository> {
 
+    protected AddressService() {
+        super(Address.class);
+    }
+
     @Override
     public Address save(Address entity) {
         return super.save(entity);

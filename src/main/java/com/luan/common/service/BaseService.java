@@ -2,11 +2,18 @@ package com.luan.common.service;
 
 import com.luan.common.model.user.BaseEntity;
 import com.luan.common.repository.Repository;
+import com.luan.common.util.audit.AuditObjectComparator;
+import com.luan.common.util.audit.FieldChange;
 import com.luan.common.util.pagination.DataPagination;
 import com.luan.common.util.pagination.Pageable;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
+import org.glassfish.jaxb.core.v2.model.core.ID;
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.AuditReaderFactory;
+import org.hibernate.envers.exception.AuditException;
+import org.hibernate.envers.query.AuditEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +24,12 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
 
     @Inject
     public R repository;
+
+    private final Class<T> entityType;
+
+    protected BaseService(Class<T> entityType) {
+        this.entityType = entityType;
+    }
 
     @Transactional
     @Override
@@ -65,6 +78,41 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
 
     public DataPagination<T> findAllPaginated(Pageable pageable) {
         return this.repository.findAll(pageable);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<T> listRevisions(ID id) {
+        try {
+            AuditReader auditReader = AuditReaderFactory.get(repository.getEntityManager());
+            return auditReader.createQuery()
+                    .forRevisionsOfEntity(entityType, false, true)
+                    .add(AuditEntity.id().eq(id))
+                    .getResultList();
+        } catch (AuditException e) {
+            throw new RuntimeException("Error fetching revisions", e);
+        }
+    }
+
+    public T findRevision(ID id, int revision) {
+        try {
+            AuditReader auditReader = AuditReaderFactory.get(repository.getEntityManager());
+            return auditReader.find(entityType, id, revision);
+        } catch (AuditException e) {
+            throw new RuntimeException("Error fetching specific revision", e);
+        }
+    }
+
+    public List<FieldChange> compareWithRevision(ID entityId, int revisionNumber) throws IllegalAccessException {
+        AuditReader auditReader = AuditReaderFactory.get(repository.getEntityManager());
+
+        T oldVersion = auditReader.find(entityType, entityId, revisionNumber);
+        if (oldVersion == null) {
+            throw new IllegalArgumentException("Revisão não encontrada para o número fornecido.");
+        }
+
+        T currentVersion = repository.getEntityManager().find(entityType, entityId);
+
+        return AuditObjectComparator.compareObjects(oldVersion, currentVersion);
     }
 
 }

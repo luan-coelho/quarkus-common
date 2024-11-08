@@ -1,8 +1,6 @@
 package com.luan.common.model.user;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +17,8 @@ public class Company extends BaseEntity {
     private String corporateName;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    @JoinColumn(name = "company_id", referencedColumnName = "company_id",
+            foreignKey = @ForeignKey(name = "fk_company_employee"))
     private List<Employee> employees;
 
 }

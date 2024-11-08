@@ -11,6 +11,10 @@ import java.util.UUID;
 @ApplicationScoped
 public class UserService extends BaseService<User, UUID, UserRepository> {
 
+    protected UserService() {
+        super(User.class);
+    }
+
     @Transactional
     @Override
     public User save(User entity) {

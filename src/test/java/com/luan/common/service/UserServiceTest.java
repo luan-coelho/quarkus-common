@@ -42,6 +42,33 @@ class UserServiceTest {
         assertNotNull(address.getUser());
     }
 
+    @Test
+    void testUpdate() {
+        User user = createUser();
+        LocalDate today = DateUtils.getCurrentDate();
+
+        service.save(user);
+        Address address = user.getAddress();
+
+        user.setName("Test 2");
+        address.setStreet("Test 2");
+        service.updateById(user, user.getId());
+
+        /* USER */
+        assertTrue(DateUtils.isSameDayIgnoringTime(today, user.getCreatedAt()));
+        assertTrue(DateUtils.isSameDayIgnoringTime(today, user.getUpdatedAt()));
+        assertEquals(1, user.getVersion());
+        assertTrue(user.isActive());
+        assertNotNull(user.getAddress());
+
+        /* ADDRESS */
+        assertTrue(DateUtils.isSameDayIgnoringTime(today, address.getCreatedAt()));
+        assertTrue(DateUtils.isSameDayIgnoringTime(today, address.getUpdatedAt()));
+        assertEquals(1, address.getVersion());
+        assertTrue(address.isActive());
+        assertNotNull(address.getUser());
+    }
+
     private User createUser() {
         User user = new User();
         user.setName("Test");
