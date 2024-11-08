@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@ToString
 @Getter
 @Setter
 @Entity
@@ -16,7 +15,8 @@ public abstract class Employee extends BaseEntity {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "company_id")
+    @JoinColumn(name = "company_id", referencedColumnName = "id",
+            foreignKey = @ForeignKey(name = "fk_company_employee"))
     private Company company;
 
 }

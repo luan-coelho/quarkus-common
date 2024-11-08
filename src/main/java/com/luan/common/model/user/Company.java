@@ -17,8 +17,6 @@ public class Company extends BaseEntity {
     private String corporateName;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
-    @JoinColumn(name = "company_id", referencedColumnName = "company_id",
-            foreignKey = @ForeignKey(name = "fk_company_employee"))
     private List<Employee> employees;
 
 }
