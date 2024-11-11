@@ -3,11 +3,9 @@ package com.luan.common.model.user;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
 @Entity
 @Table(name = "`user`")
 public class User extends BaseEntity {

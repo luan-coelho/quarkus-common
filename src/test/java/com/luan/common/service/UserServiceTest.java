@@ -3,8 +3,11 @@ package com.luan.common.service;
 import com.luan.common.model.user.Address;
 import com.luan.common.model.user.User;
 import com.luan.common.util.pagination.DateUtils;
+import io.quarkus.hibernate.orm.panache.Panache;
+import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -28,7 +31,7 @@ class UserServiceTest {
         /* USER */
         assertNotNull(user.getId());
         assertTrue(DateUtils.isSameDayIgnoringTime(today, user.getCreatedAt()));
-        assertNotNull(user.getUpdatedAt());
+        assertNull(user.getUpdatedAt());
         assertEquals(0, user.getVersion());
         assertTrue(user.isActive());
         assertNotNull(user.getAddress());
@@ -36,43 +39,36 @@ class UserServiceTest {
         /* ADDRESS */
         assertNotNull(address.getId());
         assertTrue(DateUtils.isSameDayIgnoringTime(today, address.getCreatedAt()));
-        assertNotNull(address.getUpdatedAt());
+        assertNull(address.getUpdatedAt());
         assertEquals(0, address.getVersion());
         assertTrue(address.isActive());
         assertNotNull(address.getUser());
     }
 
+    @Transactional
     @Test
     void testUpdate() {
-        User user = createUser();
+        User persistedUser = createUser();
+        User updatedUser = createUser();
         LocalDate today = DateUtils.getCurrentDate();
 
-        service.save(user);
-        Address address = user.getAddress();
+        service.save(persistedUser);
 
-        user.setName("Test 2");
-        address.setStreet("Test 2");
-        service.updateById(user, user.getId());
+        updatedUser.setName("João");
+        service.updateById(updatedUser, persistedUser.getId());
 
         /* USER */
-        assertTrue(DateUtils.isSameDayIgnoringTime(today, user.getCreatedAt()));
-        assertTrue(DateUtils.isSameDayIgnoringTime(today, user.getUpdatedAt()));
-        assertEquals(1, user.getVersion());
-        assertTrue(user.isActive());
-        assertNotNull(user.getAddress());
-
-        /* ADDRESS */
-        assertTrue(DateUtils.isSameDayIgnoringTime(today, address.getCreatedAt()));
-        assertTrue(DateUtils.isSameDayIgnoringTime(today, address.getUpdatedAt()));
-        assertEquals(1, address.getVersion());
-        assertTrue(address.isActive());
-        assertNotNull(address.getUser());
+        assertTrue(DateUtils.isSameDayIgnoringTime(today, persistedUser.getCreatedAt()));
+        assertTrue(DateUtils.isSameDayIgnoringTime(today, persistedUser.getUpdatedAt()));
+        assertEquals(1, persistedUser.getVersion());
+        assertTrue(persistedUser.isActive());
+        assertNotNull(persistedUser.getAddress());
     }
 
     private User createUser() {
         User user = new User();
-        user.setName("Test");
-        user.setEmail("test@gmail.com");
+        user.setName("Luan");
+        user.setEmail("luan@gmail.com");
         Address address = createAddress();
         user.setAddress(address);
         return user;

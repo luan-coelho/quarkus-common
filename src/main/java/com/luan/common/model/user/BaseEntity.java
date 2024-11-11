@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-@ToString
 @Getter
 @Setter
 @Audited
@@ -24,10 +23,7 @@ public abstract class BaseEntity {
     @Column(columnDefinition = "UUID")
     private UUID id;
 
-    @CreationTimestamp
     private LocalDateTime createdAt;
-
-    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     @Version
@@ -36,6 +32,16 @@ public abstract class BaseEntity {
     @Column(nullable = false)
     private boolean active = Boolean.TRUE;
 
+    @PrePersist
+    public void onPersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

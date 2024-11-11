@@ -1,5 +1,6 @@
 package com.luan.common.service;
 
+import com.luan.common.mapper.BaseMapper;
 import com.luan.common.model.user.BaseEntity;
 import com.luan.common.repository.Repository;
 import com.luan.common.util.audit.AuditObjectComparator;
@@ -9,6 +10,7 @@ import com.luan.common.util.pagination.Pageable;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.glassfish.jaxb.core.v2.model.core.ID;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
@@ -18,18 +20,18 @@ import org.hibernate.envers.query.AuditEntity;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @SuppressWarnings({"CdiInjectionPointsInspection"})
-public abstract class BaseService<T extends BaseEntity, UUID, R extends Repository<T, UUID>>
+public abstract class BaseService<T extends BaseEntity, UUID, R extends Repository<T, UUID>, M extends BaseMapper<T>>
         implements Service<T, UUID> {
 
     @Inject
-    public R repository;
+    R repository;
+
+    @Inject
+    M mapper;
 
     private final Class<T> entityType;
-
-    protected BaseService(Class<T> entityType) {
-        this.entityType = entityType;
-    }
 
     @Transactional
     @Override
@@ -55,11 +57,10 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
     @Transactional
     @Override
     public T updateById(T entity, UUID uuid) {
-        if (!this.existsById(uuid)) {
-            throw new NotFoundException("Entity not found");
-        }
-        this.repository.persist(entity);
-        return entity;
+        T databaseEntity = this.findById(uuid);
+        this.mapper.copyProperties(entity, databaseEntity);
+        repository.getEntityManager().merge(databaseEntity);
+        return databaseEntity;
     }
 
     @Transactional
