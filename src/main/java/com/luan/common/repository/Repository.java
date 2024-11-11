@@ -7,15 +7,10 @@ import com.luan.common.util.pagination.Pagination;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Page;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 
 import java.util.List;
 
 public class Repository<T extends BaseEntity, UUID> implements PanacheRepositoryBase<T, UUID> {
-
-    @PersistenceContext
-    EntityManager em;
 
     public DataPagination<T> findAll(Pageable pageable) {
         PanacheQuery<T> panacheQuery = findAll();
@@ -37,11 +32,6 @@ public class Repository<T extends BaseEntity, UUID> implements PanacheRepository
         long totalItems = panacheQuery.count();
         long totalPages = (long) Math.ceil((double) totalItems / pageable.getSize());
         return new Pagination(pageable.getPage(), totalPages, totalItems);
-    }
-
-    @Override
-    public EntityManager getEntityManager() {
-        return this.em;
     }
 
 }

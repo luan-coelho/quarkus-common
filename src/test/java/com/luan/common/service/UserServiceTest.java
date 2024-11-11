@@ -3,11 +3,9 @@ package com.luan.common.service;
 import com.luan.common.model.user.Address;
 import com.luan.common.model.user.User;
 import com.luan.common.util.pagination.DateUtils;
-import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -20,6 +18,7 @@ class UserServiceTest {
     @Inject
     UserService service;
 
+    @TestTransaction
     @Test
     void testSave() {
         User user = createUser();
@@ -45,17 +44,16 @@ class UserServiceTest {
         assertNotNull(address.getUser());
     }
 
-    @Transactional
+    @TestTransaction
     @Test
     void testUpdate() {
         User persistedUser = createUser();
-        User updatedUser = createUser();
         LocalDate today = DateUtils.getCurrentDate();
 
         service.save(persistedUser);
-
-        updatedUser.setName("João");
-        service.updateById(updatedUser, persistedUser.getId());
+        persistedUser.setName("João");
+        service.updateById(persistedUser, persistedUser.getId());
+        service.getRepository().getEntityManager().flush();
 
         /* USER */
         assertTrue(DateUtils.isSameDayIgnoringTime(today, persistedUser.getCreatedAt()));
@@ -69,6 +67,7 @@ class UserServiceTest {
         User user = new User();
         user.setName("Luan");
         user.setEmail("luan@gmail.com");
+        user.setCpf("");
         Address address = createAddress();
         user.setAddress(address);
         return user;

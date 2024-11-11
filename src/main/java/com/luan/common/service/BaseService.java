@@ -10,6 +10,7 @@ import com.luan.common.util.pagination.Pageable;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.glassfish.jaxb.core.v2.model.core.ID;
 import org.hibernate.envers.AuditReader;
@@ -25,6 +26,7 @@ import java.util.Optional;
 public abstract class BaseService<T extends BaseEntity, UUID, R extends Repository<T, UUID>, M extends BaseMapper<T>>
         implements Service<T, UUID> {
 
+    @Getter
     @Inject
     R repository;
 
