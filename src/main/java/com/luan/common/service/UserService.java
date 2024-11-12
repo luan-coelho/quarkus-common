@@ -5,6 +5,7 @@ import com.luan.common.model.user.Address;
 import com.luan.common.model.user.User;
 import com.luan.common.repository.UserRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ public class UserService extends BaseService<User, UUID, UserRepository, UserMap
         super(User.class);
     }
 
+    @Transactional
     @Override
     public User save(User entity) {
         Address address = entity.getAddress();

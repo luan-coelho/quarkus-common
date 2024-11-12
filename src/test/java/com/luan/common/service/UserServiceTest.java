@@ -1,5 +1,8 @@
 package com.luan.common.service;
 
+    import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.luan.common.model.user.Address;
 import com.luan.common.model.user.User;
 import com.luan.common.util.pagination.DateUtils;
@@ -17,6 +20,8 @@ class UserServiceTest {
 
     @Inject
     UserService service;
+    @Inject
+    ObjectMapper objectMapper;
 
     @TestTransaction
     @Test
@@ -46,7 +51,7 @@ class UserServiceTest {
 
     @TestTransaction
     @Test
-    void testUpdate() {
+    void testUpdate() throws JsonProcessingException {
         User persistedUser = createUser();
         LocalDate today = DateUtils.getCurrentDate();
 
@@ -54,6 +59,10 @@ class UserServiceTest {
         persistedUser.setName("João");
         service.updateById(persistedUser, persistedUser.getId());
         service.getRepository().getEntityManager().flush();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        System.out.println(objectMapper.writeValueAsString(persistedUser));
 
         /* USER */
         assertTrue(DateUtils.isSameDayIgnoringTime(today, persistedUser.getCreatedAt()));

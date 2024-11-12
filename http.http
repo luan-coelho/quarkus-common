@@ -1,0 +1,47 @@
+###
+GET http://localhost:8080/users
+
+###
+GET http://localhost:8080/users/62eb330f-c60e-4345-a5f8-da69bd2ad1c9
+
+###
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "name": "João",
+  "email": "luan@gmail.com",
+  "cpf": "",
+  "password": null,
+  "address": {
+    "zipCode": "12345678",
+    "street": "Test",
+    "city": "Test",
+    "state": "Test",
+    "number": "123",
+    "complement": null
+  },
+  "primaryPhone": null,
+  "secondaryPhone": null
+}
+
+###
+PUT http://localhost:8080/users/37812547-179c-4da6-9af8-b327d502225f
+Content-Type: application/json
+
+{
+  "name": "João",
+  "email": "joão@gmail.com",
+  "cpf": "298.631.820-79",
+  "password": "123",
+  "address": {
+    "zipCode": "68908-192",
+    "street": "Passagem Santa Luzia",
+    "city": "Macapá",
+    "state": "AP",
+    "number": "18",
+    "complement": null
+  },
+  "primaryPhone": "(96) 3895-7144",
+  "secondaryPhone": "(96) 98763-2104"
+}
