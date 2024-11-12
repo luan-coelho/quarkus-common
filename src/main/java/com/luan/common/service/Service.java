@@ -1,5 +1,6 @@
 package com.luan.common.service;
 
+import com.luan.common.model.user.AuditRevisionEntity;
 import com.luan.common.util.audit.FieldChange;
 import com.luan.common.util.pagination.DataPagination;
 import com.luan.common.util.pagination.Pageable;
@@ -23,7 +24,7 @@ public interface Service<T, UUID> {
 
     boolean existsById(UUID id);
 
-    List<T> listRevisions(UUID id);
+    List<T> listAllRevisions(UUID id);
 
     List<FieldChange> compareWithPreviousRevision(UUID entityId, int revisionId);
 

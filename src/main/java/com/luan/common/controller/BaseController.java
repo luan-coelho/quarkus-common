@@ -45,7 +45,7 @@ public abstract class BaseController<T extends BaseEntity, UUID, S extends Servi
     @Path("/{id}/revisions")
     @GET
     public Response listRevisions(UUID id) {
-        return Response.ok(service.listRevisions(id)).build();
+        return Response.ok(service.listAllRevisions(id)).build();
     }
 
     @Path("/{id}/revisions/{revision}/compare")

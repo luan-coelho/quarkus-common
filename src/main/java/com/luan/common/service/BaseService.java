@@ -8,6 +8,8 @@ import com.luan.common.util.audit.FieldChange;
 import com.luan.common.util.pagination.DataPagination;
 import com.luan.common.util.pagination.Pageable;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.Getter;
@@ -33,6 +35,9 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
     M mapper;
 
     private final Class<T> entityType;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Transactional
     @Override
@@ -89,28 +94,21 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<T> listRevisions(UUID id) {
-        try {
-            AuditReader auditReader = AuditReaderFactory.get(repository.getEntityManager());
-            return auditReader.createQuery()
-                    .forRevisionsOfEntity(entityType, false, true)
-                    .add(AuditEntity.id().eq(id))
-                    .getResultList();
-        } catch (AuditException e) {
-            throw new RuntimeException("Error fetching revisions", e);
-        }
+    public List<T> listAllRevisions(UUID entityId) {
+        AuditReader reader = AuditReaderFactory.get(entityManager);
+        AuditQuery query = reader.createQuery()
+                .forRevisionsOfEntity(entityType, false, true)
+                .add(AuditEntity.id().eq(entityId));
+        return query.getResultList();
     }
 
-    public T findRevision(UUID id, int revision) {
-        try {
-            AuditReader auditReader = AuditReaderFactory.get(repository.getEntityManager());
-            return auditReader.find(entityType, id, revision);
-        } catch (AuditException e) {
-            throw new RuntimeException("Error fetching specific revision", e);
-        }
-    }
-
-    @Override
+    /**
+     * Compares a specified revision of an entity with its previous revision.
+     *
+     * @param entityId   The ID of the entity.
+     * @param revisionId The ID of the revision to compare.
+     * @return A list of FieldChange objects representing the differences.
+     */
     public List<FieldChange> compareWithPreviousRevision(UUID entityId, int revisionId) {
         AuditReader auditReader = AuditReaderFactory.get(getRepository().getEntityManager());
 

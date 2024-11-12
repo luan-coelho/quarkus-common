@@ -1,10 +1,10 @@
-###
+### Listar usuários
 GET http://localhost:8080/users
 
-###
-GET http://localhost:8080/users/62eb330f-c60e-4345-a5f8-da69bd2ad1c9
+### Buscar usuário por ID
+GET http://localhost:8080/users/5724bff6-c06f-43b1-8bf6-360eb487aea8
 
-###
+### Cadastrar usuário
 POST http://localhost:8080/users
 Content-Type: application/json
 
@@ -25,8 +25,8 @@ Content-Type: application/json
   "secondaryPhone": null
 }
 
-###
-PUT http://localhost:8080/users/7108c2ca-d00a-4ed7-86c7-f1f1e87f7c6e
+### Alterar usuário
+PUT http://localhost:8080/users/3533bf47-9b5a-4877-8dc1-12cb536280c3
 Content-Type: application/json
 
 {
@@ -46,8 +46,8 @@ Content-Type: application/json
   "secondaryPhone": "(96) 98763-2104"
 }
 
-###
+### Listar revisões
 GET http://localhost:8080/users/868046dd-68d6-49b5-a462-471e31ad386a/revisions
 
-###
-GET http://localhost:8080/users/868046dd-68d6-49b5-a462-471e31ad386a/revisions/2/compare
+### Comparar revisões
+GET http://localhost:8080/users/868046dd-68d6-49b5-a462-471e31ad386a/revisions/1/compare
