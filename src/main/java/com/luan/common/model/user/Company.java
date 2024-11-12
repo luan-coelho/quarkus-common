@@ -3,11 +3,13 @@ package com.luan.common.model.user;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.envers.Audited;
 
 import java.util.List;
 
 @Getter
 @Setter
+@Audited
 @Entity
 public class Company extends BaseEntity {
 

@@ -1,20 +1,31 @@
 package com.luan.common.service;
 
-import java.util.Collection;
+import com.luan.common.util.audit.FieldChange;
+import com.luan.common.util.pagination.DataPagination;
+import com.luan.common.util.pagination.Pageable;
 
-public interface Service<T, ID> {
+import java.util.Collection;
+import java.util.List;
+
+public interface Service<T, UUID> {
 
     T save(T entity);
 
-    T findById(ID id);
+    T findById(UUID id);
 
     Collection<T> findAll();
 
-    T updateById(T entity, ID id);
+    DataPagination<T> findAll(Pageable pageable);
 
-    void deleteById(ID id);
+    T updateById(T entity, UUID id);
 
-    boolean existsById(ID id);
+    void deleteById(UUID id);
+
+    boolean existsById(UUID id);
+
+    List<T> listRevisions(UUID id);
+
+    List<FieldChange> compareWithPreviousRevision(UUID entityId, int revisionId);
 
 }
 

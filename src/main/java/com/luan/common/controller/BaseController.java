@@ -2,6 +2,7 @@ package com.luan.common.controller;
 
 import com.luan.common.model.user.BaseEntity;
 import com.luan.common.service.Service;
+import com.luan.common.util.pagination.Pageable;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
@@ -13,8 +14,8 @@ public abstract class BaseController<T extends BaseEntity, UUID, S extends Servi
     S service;
 
     @GET
-    public Response getAll() {
-        return Response.ok(this.service.findAll()).build();
+    public Response getAll(Pageable pageable) {
+        return Response.ok(this.service.findAll(pageable)).build();
     }
 
     @Path("/{id}")
@@ -39,6 +40,18 @@ public abstract class BaseController<T extends BaseEntity, UUID, S extends Servi
     public Response deleteById(@PathParam("id") UUID id) {
         service.deleteById(id);
         return Response.noContent().build();
+    }
+
+    @Path("/{id}/revisions")
+    @GET
+    public Response listRevisions(UUID id) {
+        return Response.ok(service.listRevisions(id)).build();
+    }
+
+    @Path("/{id}/revisions/{revision}/compare")
+    @GET
+    public Response compareWithRevision(UUID id, Integer revision) {
+        return Response.ok(service.compareWithPreviousRevision(id, revision)).build();
     }
 
 }

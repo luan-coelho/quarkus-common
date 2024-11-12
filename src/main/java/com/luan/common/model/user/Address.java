@@ -6,9 +6,11 @@ import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.envers.Audited;
 
 @Getter
 @Setter
+@Audited
 @Entity
 public class Address extends BaseEntity {
 

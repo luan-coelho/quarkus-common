@@ -26,7 +26,7 @@ Content-Type: application/json
 }
 
 ###
-PUT http://localhost:8080/users/37812547-179c-4da6-9af8-b327d502225f
+PUT http://localhost:8080/users/7108c2ca-d00a-4ed7-86c7-f1f1e87f7c6e
 Content-Type: application/json
 
 {
@@ -45,3 +45,9 @@ Content-Type: application/json
   "primaryPhone": "(96) 3895-7144",
   "secondaryPhone": "(96) 98763-2104"
 }
+
+###
+GET http://localhost:8080/users/868046dd-68d6-49b5-a462-471e31ad386a/revisions
+
+###
+GET http://localhost:8080/users/868046dd-68d6-49b5-a462-471e31ad386a/revisions/2/compare
