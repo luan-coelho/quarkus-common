@@ -1,5 +1,6 @@
 package com.luan.common.service;
 
+import com.luan.common.annotation.AuditFieldLabel;
 import com.luan.common.mapper.BaseMapper;
 import com.luan.common.model.user.AuditRevisionEntity;
 import com.luan.common.model.user.BaseEntity;
@@ -131,6 +132,11 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
 
         // Comparação dos campos entre as revisões
         for (Field field : entityType.getDeclaredFields()) {
+            String label = field.getName().replaceFirst("^[a-z]", (field.getName().charAt(0) + "").toUpperCase());
+
+            if (field.isAnnotationPresent(AuditFieldLabel.class)) {
+                label = field.getAnnotation(AuditFieldLabel.class).value();
+            }
             field.setAccessible(true);
 
             try {
@@ -138,7 +144,7 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
                 Object newValue = field.get(currentRevision);
 
                 if (!Objects.equals(oldValue, newValue)) {
-                    fieldChanges.add(new FieldChange("", field.getName(), oldValue, newValue, fieldChanges.size()));
+                    fieldChanges.add(new FieldChange(field.getName(), label, oldValue, newValue, fieldChanges.size()));
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
