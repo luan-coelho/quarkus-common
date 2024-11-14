@@ -4,17 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.RevisionType;
 
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class FieldChange {
+public class Revision<T> {
 
-    private String name;
-    private String label;
-    private Object oldValue;
-    private Object newValue;
-    private int order;
+    private Number revisionId;
+    private RevisionType revisionType;
+    private T entity;
 
 }

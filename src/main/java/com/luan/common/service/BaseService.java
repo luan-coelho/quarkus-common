@@ -5,22 +5,23 @@ import com.luan.common.model.user.AuditRevisionEntity;
 import com.luan.common.model.user.BaseEntity;
 import com.luan.common.repository.Repository;
 import com.luan.common.util.audit.FieldChange;
+import com.luan.common.util.audit.Revision;
+import com.luan.common.util.audit.RevisionComparison;
 import com.luan.common.util.pagination.DataPagination;
 import com.luan.common.util.pagination.Pageable;
 import jakarta.inject.Inject;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
-import org.hibernate.envers.exception.AuditException;
 import org.hibernate.envers.query.AuditEntity;
 import org.hibernate.envers.query.AuditQuery;
 
+import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @SuppressWarnings({"CdiInjectionPointsInspection"})
@@ -35,9 +36,6 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
     M mapper;
 
     private final Class<T> entityType;
-
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Transactional
     @Override
@@ -92,107 +90,64 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
         return this.repository.findAll(pageable);
     }
 
+    @Transactional
     @Override
-    @SuppressWarnings("unchecked")
-    public List<T> listAllRevisions(UUID entityId) {
-        AuditReader reader = AuditReaderFactory.get(entityManager);
-        AuditQuery query = reader.createQuery()
-                .forRevisionsOfEntity(entityType, false, true)
-                .add(AuditEntity.id().eq(entityId));
-        return query.getResultList();
+    public List<Revision<T>> findAllRevisions(UUID entityId) {
+        AuditReader reader = AuditReaderFactory.get(getRepository().getEntityManager());
+        List<Number> revisionsNumbers = reader.getRevisions(entityType, entityId);
+        List<Revision<T>> revisionList = new ArrayList<>();
+        for (Number revisionNumber : revisionsNumbers) {
+            T t = reader.find(entityType, entityId, revisionNumber.intValue());
+            Revision<T> revisionObj = new Revision<>();
+            revisionObj.setRevisionId(revisionNumber);
+            revisionObj.setEntity(t);
+            revisionList.add(revisionObj);
+        }
+        return revisionList;
     }
 
-    /**
-     * Compares a specified revision of an entity with its previous revision.
-     *
-     * @param entityId   The ID of the entity.
-     * @param revisionId The ID of the revision to compare.
-     * @return A list of FieldChange objects representing the differences.
-     */
-    public List<FieldChange> compareWithPreviousRevision(UUID entityId, int revisionId) {
-        AuditReader auditReader = AuditReaderFactory.get(getRepository().getEntityManager());
+    @Override
+    @Transactional
+    public RevisionComparison compareWithPreviousRevision(UUID entityId, Integer revisionId) {
+        AuditReader reader = AuditReaderFactory.get(getRepository().getEntityManager());
 
-        // Retrieve the current revision entity
-        T currentEntity = auditReader.find(entityType, entityId, revisionId);
-        if (currentEntity == null) {
-            throw new IllegalArgumentException("Revision ID not found for entity.");
+        // Obtém a revisão atual e a anterior
+        T currentRevision = reader.find(entityType, entityId, revisionId);
+        Number previousRevisionId = reader.getRevisionNumberForDate(reader.getRevisionDate(revisionId).toInstant().minusMillis(1));
+        if (previousRevisionId == null) {
+            return null; // Se não houver revisão anterior, retorna null ou outro tratamento adequado
         }
+        T previousRevision = reader.find(entityType, entityId, previousRevisionId);
 
-        // Retrieve the current revision metadata
-        AuditQuery currentRevisionQuery = auditReader.createQuery()
-                .forRevisionsOfEntity(entityType, false, true)
-                .add(AuditEntity.id().eq(entityId))
-                .add(AuditEntity.revisionNumber().eq(revisionId));
-        Object[] currentRevisionData = (Object[]) currentRevisionQuery.getSingleResult();
+        // Configuração inicial do objeto de comparação
+        AuditRevisionEntity currentRevEntity = reader.findRevision(AuditRevisionEntity.class, revisionId);
 
-        String currentRevisionAuthor = ((AuditRevisionEntity) currentRevisionData[1]).getUsername();
-        Date currentRevisionDate = ((AuditRevisionEntity) currentRevisionData[1]).getRevisionDate();
+        RevisionComparison comparison = new RevisionComparison();
+        comparison.setRevisionAuthor(currentRevEntity.getUsername());
+        comparison.setRevisionDateTime(currentRevEntity.getRevisionDate());
+        comparison.setRevisionType("");
 
-        // Retrieve the previous revision number, if it exists
-        Number previousRevisionNumber = (Number) auditReader.createQuery()
-                .forRevisionsOfEntity(entityType, false, true)
-                .add(AuditEntity.id().eq(entityId))
-                .add(AuditEntity.revisionNumber().lt(revisionId))
-                .addOrder(AuditEntity.revisionNumber().desc())
-                .setMaxResults(1)
-                .getSingleResult();
+        List<FieldChange> fieldChanges = new ArrayList<>();
 
-        if (previousRevisionNumber == null) {
-            // No previous revision found; likely the creation revision
-            return generateInitialChanges(currentEntity, currentRevisionAuthor, currentRevisionDate);
-        }
-
-        // Fetch the previous revision entity
-        T previousEntity = auditReader.find(entityType, entityId, previousRevisionNumber.intValue());
-
-        return generateFieldChanges(entityType, previousEntity, currentEntity, currentRevisionAuthor, currentRevisionDate);
-    }
-
-    private List<FieldChange> generateInitialChanges(T entity, String revisionAuthor, Date revisionDate) {
-        List<FieldChange> initialChanges = new ArrayList<>();
-        for (var field : entity.getClass().getDeclaredFields()) {
+        // Comparação dos campos entre as revisões
+        for (Field field : entityType.getDeclaredFields()) {
             field.setAccessible(true);
-            try {
-                Object newValue = field.get(entity);
-                initialChanges.add(new FieldChange(
-                        field.getName(),
-                        null, // No previous value as this is the creation
-                        newValue,
-                        revisionAuthor,
-                        revisionDate
-                ));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        return initialChanges;
-    }
 
-    private List<FieldChange> generateFieldChanges(Class<T> entityClass, T previousEntity, T currentEntity, String revisionAuthor, Date revisionDate) {
-        List<FieldChange> changes = new ArrayList<>();
-
-        // Compare fields between previous and current entities
-        for (var field : entityClass.getDeclaredFields()) {
-            field.setAccessible(true);
             try {
-                Object oldValue = field.get(previousEntity);
-                Object newValue = field.get(currentEntity);
+                Object oldValue = field.get(previousRevision);
+                Object newValue = field.get(currentRevision);
 
                 if (!Objects.equals(oldValue, newValue)) {
-                    changes.add(new FieldChange(
-                            field.getName(),
-                            oldValue,
-                            newValue,
-                            revisionAuthor,
-                            revisionDate
-                    ));
+                    fieldChanges.add(new FieldChange("", field.getName(), oldValue, newValue, fieldChanges.size()));
                 }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
 
-        return changes;
+        comparison.setFieldChanges(fieldChanges);
+        return comparison;
     }
+
 
 }
