@@ -153,6 +153,10 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
             try {
                 field.setAccessible(true);
 
+                if (field.getName().startsWith("$$_") || field.getName().contains("hibernate")) {
+                    continue;
+                }
+
                 Object value = field.get(currentEntity);
 
                 String label = field.getName();
@@ -163,10 +167,6 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
                     if (ignore) {
                         continue;
                     }
-                }
-
-                if (field.getName().startsWith("$$_") || field.getName().contains("hibernate")) {
-                    continue;
                 }
 
                 FieldChange change = new FieldChange();
@@ -194,6 +194,10 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
             try {
                 field.setAccessible(true);
 
+                if (field.getName().startsWith("$$_") || field.getName().contains("hibernate")) {
+                    continue;
+                }
+
                 String label = field.getName();
                 if (field.isAnnotationPresent(AuditFieldLabel.class)) {
                     label = field.getAnnotation(AuditFieldLabel.class).value();
@@ -202,10 +206,6 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
                     if (ignore) {
                         continue;
                     }
-                }
-
-                if (field.getName().startsWith("$$_") || field.getName().contains("hibernate")) {
-                    continue;
                 }
 
                 Object oldValue = field.get(previousEntity);
