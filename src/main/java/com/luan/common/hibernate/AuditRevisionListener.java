@@ -1,4 +1,4 @@
-package com.luan.common;
+package com.luan.common.hibernate;
 
 import com.luan.common.model.user.AuditRevisionEntity;
 import org.hibernate.envers.RevisionListener;

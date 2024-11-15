@@ -19,6 +19,8 @@ public @interface AuditFieldLabel {
      *
      * @return rótulo (label) do campo.
      */
-    String value();
+    String value() default "";
+
+    boolean ignore() default false;
 
 }

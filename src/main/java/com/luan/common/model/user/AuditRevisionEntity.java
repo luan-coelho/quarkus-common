@@ -1,6 +1,6 @@
 package com.luan.common.model.user;
 
-import com.luan.common.AuditRevisionListener;
+import com.luan.common.hibernate.AuditRevisionListener;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;

@@ -22,7 +22,7 @@ public class User extends BaseEntity {
     @AuditFieldLabel("CPF")
     private String cpf;
 
-    @AuditFieldLabel("Senha")
+    @AuditFieldLabel(ignore = true)
     private String password;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
