@@ -18,6 +18,6 @@ public class FieldChange {
     private Object oldValue;
     private Object newValue;
     private int order;
-//    private List<FieldChange> subFieldChanges;
+    private List<FieldChange> subFieldChanges;
 
 }

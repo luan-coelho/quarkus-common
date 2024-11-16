@@ -23,4 +23,6 @@ public @interface AuditFieldLabel {
 
     boolean ignore() default false;
 
+    int order() default 0;
+
 }

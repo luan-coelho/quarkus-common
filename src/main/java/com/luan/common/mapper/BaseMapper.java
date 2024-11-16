@@ -8,4 +8,8 @@ public interface BaseMapper<T extends BaseEntity> {
 
     }
 
+    default <S> S toResponse(T targetClass) {
+        return null;
+    }
+
 }

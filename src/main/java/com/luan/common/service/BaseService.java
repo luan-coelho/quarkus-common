@@ -7,6 +7,7 @@ import com.luan.common.model.user.BaseEntity;
 import com.luan.common.repository.Repository;
 import com.luan.common.util.audit.FieldChange;
 import com.luan.common.util.audit.Revision;
+import com.luan.common.util.audit.RevisionComparator;
 import com.luan.common.util.audit.RevisionComparison;
 import com.luan.common.util.pagination.DataPagination;
 import com.luan.common.util.pagination.Pageable;
@@ -20,11 +21,12 @@ import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.RevisionType;
 import org.hibernate.envers.query.AuditEntity;
-import org.hibernate.envers.query.AuditQuery;
 
 import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.Temporal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -94,56 +96,83 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
         return this.repository.findAll(pageable);
     }
 
-    @SuppressWarnings("unchecked")
     @Transactional
     @Override
-    public List<Revision<T>> findAllRevisions(UUID entityId) {
-        AuditReader auditReader = AuditReaderFactory.get(getRepository().getEntityManager());
-        return auditReader.createQuery()
-                .forRevisionsOfEntity(entityType, true, true)
-                .add(AuditEntity.id().eq(entityId))
-                .getResultList();
+    public <DTO> List<Revision<DTO>> findAllRevisions(UUID entityId) {
+        AuditReader reader = AuditReaderFactory.get(getRepository().getEntityManager());
+        List<Number> revisionsNumbers = reader.getRevisions(entityType, entityId);
+        List<Revision<DTO>> revisionList = new ArrayList<>();
+        for (Number revisionNumber : revisionsNumbers) {
+            T entity = reader.find(entityType, entityId, revisionNumber.intValue());
+            DTO entityDto = mapper.toResponse(entity);
+            Revision<DTO> revisionObj = new Revision<>();
+            revisionObj.setRevisionId(revisionNumber);
+            revisionObj.setRevisionType(getRevisionType(reader, entityId, revisionNumber));
+            revisionObj.setEntity(entityDto);
+            revisionList.add(revisionObj);
+        }
+        return revisionList;
     }
 
-    @Override
-    @Transactional
-    public RevisionComparison compareWithPreviousRevision(UUID entityId, Integer revisionId) {
+    private RevisionComparator<T> buildComparator(UUID entityId, Integer revisionId) {
+        RevisionComparator<T> comparator = new RevisionComparator<>();
+
         AuditReader auditReader = AuditReaderFactory.get(getRepository().getEntityManager());
+        comparator.setAuditReader(auditReader);
 
         List<Number> revisions = auditReader.getRevisions(entityType, entityId);
 
         int currentRevisionIndex = revisions.indexOf(revisionId);
+        comparator.setCurrentRevisionIndex(currentRevisionIndex);
+
         if (currentRevisionIndex == -1) {
             throw new IllegalArgumentException("Revisão não encontrada.");
         }
 
         Number currentRevision = revisions.get(currentRevisionIndex);
-        T currentEntity = auditReader.find(entityType, entityId, currentRevision);
-        AuditRevisionEntity currentRevisionEntity = auditReader.findRevision(AuditRevisionEntity.class, currentRevision);
 
-        T previousEntity = null;
+        T currentEntity = auditReader.find(entityType, entityId, currentRevision);
+        comparator.setCurrentEntity(currentEntity);
+        AuditRevisionEntity currentRevisionEntity = auditReader.findRevision(AuditRevisionEntity.class, currentRevision);
+        comparator.setCurrentRevisionEntity(currentRevisionEntity);
+
+        T previousEntity;
         if (currentRevisionIndex > 0) {
             Number previousRevision = revisions.get(currentRevisionIndex - 1);
             previousEntity = auditReader.find(entityType, entityId, previousRevision);
+            comparator.setPreviousEntity(previousEntity);
         }
 
+        return comparator;
+    }
+
+    @Override
+    @Transactional
+    public RevisionComparison compareWithPreviousRevision(UUID entityId, Integer revisionId) {
+        RevisionComparator<T> comparator = buildComparator(entityId, revisionId);
+
         List<FieldChange> fieldChanges;
-        if (currentRevisionIndex == 0) {
-            fieldChanges = generateFieldChangesForCreation(currentEntity);
+        if (comparator.getCurrentRevisionIndex() == 0) {
+            fieldChanges = generateFieldChangesForCreation(mapper.toResponse(comparator.getCurrentEntity()));
         } else {
-            fieldChanges = compareEntities(previousEntity, currentEntity);
+            fieldChanges = compareEntities(
+                    mapper.toResponse(comparator.getPreviousEntity()),
+                    mapper.toResponse(comparator.getCurrentEntity())
+            );
         }
 
         RevisionComparison comparison = new RevisionComparison();
+        AuditRevisionEntity currentRevisionEntity = comparator.getCurrentRevisionEntity();
+
         comparison.setRevisionAuthor(currentRevisionEntity.getUsername());
         comparison.setRevisionDateTime(new Date(currentRevisionEntity.getTimestamp()));
         comparison.setFieldChanges(fieldChanges);
-        comparison.setRevisionType(getRevisionType(auditReader, entityId, currentRevision).name());
+        comparison.setRevisionType(getRevisionType(comparator.getAuditReader(), entityId, revisionId).name());
 
         return comparison;
     }
 
-    private List<FieldChange> generateFieldChangesForCreation(T currentEntity) {
+    private <DTO> List<FieldChange> generateFieldChangesForCreation(DTO currentEntity) {
         List<FieldChange> fieldChanges = new ArrayList<>();
         if (currentEntity == null) {
             return fieldChanges;
@@ -153,7 +182,11 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
             try {
                 field.setAccessible(true);
 
-                if (field.getName().startsWith("$$_") || field.getName().contains("hibernate")) {
+                if (field.getName().startsWith("$$_") ||
+                    field.getName().contains("hibernate") ||
+                    field.getName().equals("serialVersionUID") ||
+                    field.getName().equals("id") ||
+                    field.getDeclaringClass().getName().startsWith("java.")) {
                     continue;
                 }
 
@@ -174,6 +207,12 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
                 change.setName(field.getName());
                 change.setOldValue(value);
                 change.setNewValue(null);
+
+                int order = field.getAnnotation(AuditFieldLabel.class).order();
+                if (order == 0) {
+                    change.setOrder(fieldChanges.size() + 1);
+                }
+
                 fieldChanges.add(change);
 
             } catch (IllegalAccessException e) {
@@ -184,7 +223,7 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
         return fieldChanges;
     }
 
-    private List<FieldChange> compareEntities(T previousEntity, T currentEntity) {
+    private <DTO> List<FieldChange> compareEntities(DTO previousEntity, DTO currentEntity) {
         List<FieldChange> fieldChanges = new ArrayList<>();
         if (previousEntity == null || currentEntity == null) {
             return fieldChanges;
@@ -192,13 +231,19 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
 
         for (Field field : currentEntity.getClass().getDeclaredFields()) {
             try {
-                field.setAccessible(true);
-
-                if (field.getName().startsWith("$$_") || field.getName().contains("hibernate")) {
+                // Ignorar campos desnecessários ou problemáticos
+                if (field.getName().startsWith("$$_") ||
+                    field.getName().contains("hibernate") ||
+                    field.getName().equals("serialVersionUID") ||
+                    field.getName().equals("id") ||
+                    field.getDeclaringClass().getName().startsWith("java.")) {
                     continue;
                 }
 
+                field.setAccessible(true);
+
                 String label = field.getName();
+
                 if (field.isAnnotationPresent(AuditFieldLabel.class)) {
                     label = field.getAnnotation(AuditFieldLabel.class).value();
                     boolean ignore = field.getAnnotation(AuditFieldLabel.class).ignore();
@@ -211,20 +256,58 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
                 Object oldValue = field.get(previousEntity);
                 Object newValue = field.get(currentEntity);
 
-                if (!Objects.equals(oldValue, newValue)) {
+                if (oldValue != null && newValue != null && !isPrimitiveOrWrapperOrString(field.getType())) {
+                    List<FieldChange> subFieldChanges = compareEntities(oldValue, newValue);
+                    if (!subFieldChanges.isEmpty()) {
+                        FieldChange change = new FieldChange();
+                        change.setLabel(label);
+                        change.setName(field.getName());
+                        change.setOldValue(oldValue);
+                        change.setNewValue(newValue);
+                        change.setSubFieldChanges(subFieldChanges);
+
+                        int order = field.getAnnotation(AuditFieldLabel.class).order();
+                        if (order == 0) {
+                            change.setOrder(subFieldChanges.size() + 1);
+                        }
+
+                        fieldChanges.add(change);
+                    }
+                } else if (!Objects.equals(oldValue, newValue)) {
                     FieldChange change = new FieldChange();
                     change.setLabel(label);
                     change.setName(field.getName());
                     change.setOldValue(oldValue);
                     change.setNewValue(newValue);
+                    int order = field.getAnnotation(AuditFieldLabel.class).order();
+                    if (order == 0) {
+                        change.setOrder(fieldChanges.size() + 1);
+                    }
                     fieldChanges.add(change);
                 }
             } catch (IllegalAccessException e) {
-                throw new RuntimeException("Erro ao acessar os campos da entidade", e);
+                log.error("Erro ao comparar entidades em revisão. {}", e.getMessage());
             }
         }
 
         return fieldChanges;
+    }
+
+    private <C> boolean isPrimitiveOrWrapperOrString(Class<C> type) {
+        return type.isPrimitive() ||
+               type == String.class ||
+               type == Boolean.class ||
+               type == Byte.class ||
+               type == Character.class ||
+               type == Double.class ||
+               type == Float.class ||
+               type == Integer.class ||
+               type == Long.class ||
+               type == Short.class ||
+               type == Void.class ||
+               type == java.util.UUID.class ||
+               type == Date.class ||
+               type == Temporal.class;
     }
 
     @SuppressWarnings("unchecked")

@@ -1,5 +1,6 @@
 package com.luan.common.mapper;
 
+import com.luan.common.dto.user.UserResponseDto;
 import com.luan.common.model.user.User;
 import org.mapstruct.*;
 
@@ -11,5 +12,8 @@ public interface UserMapper extends BaseMapper<User> {
     @Mapping(target = "updatedAt", ignore = true)
     @Override
     void copyProperties(User source, @MappingTarget User target);
+
+    @Override
+    UserResponseDto toResponse(User targetClass);
 
 }
