@@ -1,6 +1,5 @@
 package com.luan.common.controller;
 
-import com.luan.common.model.user.BaseEntity;
 import com.luan.common.service.Service;
 import com.luan.common.util.pagination.Pageable;
 import jakarta.inject.Inject;
@@ -8,14 +7,14 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 
 @SuppressWarnings({"CdiInjectionPointsInspection", "RestParamTypeInspection"})
-public abstract class BaseController<T extends BaseEntity, UUID, S extends Service<T, UUID>> {
+public abstract class BaseController<T, UUID, S extends Service<T, UUID>> {
 
     @Inject
     S service;
 
     @GET
     public Response getAll(Pageable pageable) {
-        return Response.ok(this.service.findAll(pageable)).build();
+        return Response.ok(service.findAll(pageable)).build();
     }
 
     @Path("/{id}")
@@ -26,7 +25,7 @@ public abstract class BaseController<T extends BaseEntity, UUID, S extends Servi
 
     @POST
     public Response save(T entity) {
-        return Response.ok(service.save(entity)).build();
+        return Response.status(Response.Status.CREATED).entity(service.save(entity)).build();
     }
 
     @Path("/{id}")

@@ -58,12 +58,27 @@ class Funcionario {
 
 
 class Gerente {
+
 }
 
 class FuncionarioOperacional {
+
 }
 
 class UsuarioExterno {
+
+}
+
+class Modulo {
+    nome: String
+    menus: List<Menu>
+    usuarios: List<Usuario>
+}
+
+class MenuItem {
+    nome: String
+    url: String
+    modulo: Modulo
 }
 
 Administrador "1" --> "1" Usuario

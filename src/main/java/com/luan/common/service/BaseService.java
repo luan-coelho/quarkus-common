@@ -104,7 +104,7 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
         List<Revision<DTO>> revisionList = new ArrayList<>();
         for (Number revisionNumber : revisionsNumbers) {
             T entity = reader.find(entityType, entityId, revisionNumber.intValue());
-            DTO entityDto = mapper.toResponse(entity);
+            DTO entityDto = mapper.toDto(entity);
             Revision<DTO> revisionObj = new Revision<>();
             revisionObj.setRevisionId(revisionNumber);
             revisionObj.setRevisionType(getRevisionType(reader, entityId, revisionNumber));
@@ -153,11 +153,11 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
 
         List<FieldChange> fieldChanges;
         if (comparator.getCurrentRevisionIndex() == 0) {
-            fieldChanges = generateFieldChangesForCreation(mapper.toResponse(comparator.getCurrentEntity()));
+            fieldChanges = generateFieldChangesForCreation(mapper.toDto(comparator.getCurrentEntity()));
         } else {
             fieldChanges = compareEntities(
-                    mapper.toResponse(comparator.getPreviousEntity()),
-                    mapper.toResponse(comparator.getCurrentEntity())
+                    mapper.toDto(comparator.getPreviousEntity()),
+                    mapper.toDto(comparator.getCurrentEntity())
             );
         }
 

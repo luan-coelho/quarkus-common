@@ -1,6 +1,8 @@
-package com.luan.common.mapper;
+package com.luan.common.mapper.user;
 
 import com.luan.common.dto.user.UserResponseDto;
+import com.luan.common.mapper.BaseMapper;
+import com.luan.common.mapper.QuarkusMappingConfig;
 import com.luan.common.model.user.User;
 import org.mapstruct.*;
 
@@ -14,6 +16,6 @@ public interface UserMapper extends BaseMapper<User> {
     void copyProperties(User source, @MappingTarget User target);
 
     @Override
-    UserResponseDto toResponse(User targetClass);
+    UserResponseDto toDto(User targetClass);
 
 }

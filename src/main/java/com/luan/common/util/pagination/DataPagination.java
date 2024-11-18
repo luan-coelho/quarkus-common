@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public final class DataPagination<T> {
 
-    private List<T> data;
+    private List<T> content;
     private Pagination pagination;
 
     public DataPagination() {

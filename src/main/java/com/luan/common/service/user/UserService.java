@@ -1,9 +1,10 @@
-package com.luan.common.service;
+package com.luan.common.service.user;
 
-import com.luan.common.mapper.UserMapper;
+import com.luan.common.mapper.user.UserMapper;
 import com.luan.common.model.user.Address;
 import com.luan.common.model.user.User;
-import com.luan.common.repository.UserRepository;
+import com.luan.common.repository.user.UserRepository;
+import com.luan.common.service.BaseService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 

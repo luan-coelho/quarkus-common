@@ -11,6 +11,9 @@ import java.util.List;
 @Setter
 @Audited
 @Entity
+@Table(name = "company", uniqueConstraints = {
+        @UniqueConstraint(name = "pk_company", columnNames = {"id"}),
+})
 public class Company extends BaseEntity {
 
     private String name;

@@ -1,8 +1,9 @@
-package com.luan.common.mapper;
+package com.luan.common.mapper.user;
 
+import com.luan.common.mapper.BaseMapper;
+import com.luan.common.mapper.QuarkusMappingConfig;
 import com.luan.common.model.user.Address;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 

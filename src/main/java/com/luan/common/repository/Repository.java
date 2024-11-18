@@ -1,6 +1,5 @@
 package com.luan.common.repository;
 
-import com.luan.common.model.user.BaseEntity;
 import com.luan.common.util.pagination.DataPagination;
 import com.luan.common.util.pagination.Pageable;
 import com.luan.common.util.pagination.Pagination;
@@ -10,7 +9,7 @@ import io.quarkus.panache.common.Page;
 
 import java.util.List;
 
-public class Repository<T extends BaseEntity, UUID> implements PanacheRepositoryBase<T, UUID> {
+public class Repository<T, UUID> implements PanacheRepositoryBase<T, UUID> {
 
     public DataPagination<T> findAll(Pageable pageable) {
         PanacheQuery<T> panacheQuery = findAll();

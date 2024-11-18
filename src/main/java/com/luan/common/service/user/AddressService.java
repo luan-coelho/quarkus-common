@@ -1,8 +1,9 @@
-package com.luan.common.service;
+package com.luan.common.service.user;
 
-import com.luan.common.mapper.AddressMapper;
+import com.luan.common.mapper.user.AddressMapper;
 import com.luan.common.model.user.Address;
-import com.luan.common.repository.AddressRepository;
+import com.luan.common.repository.user.AddressRepository;
+import com.luan.common.service.BaseService;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.UUID;
