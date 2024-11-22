@@ -4,10 +4,12 @@ import com.luan.common.service.Service;
 import com.luan.common.util.pagination.Pageable;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+@Produces(MediaType.APPLICATION_JSON)
 @SuppressWarnings({"CdiInjectionPointsInspection", "RestParamTypeInspection"})
-public abstract class BaseController<T, UUID, S extends Service<T, UUID>> {
+public abstract class BaseController<T, DTO, UUID, S extends Service<T, DTO, UUID>> {
 
     @Inject
     S service;

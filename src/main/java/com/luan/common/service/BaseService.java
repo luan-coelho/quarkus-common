@@ -23,16 +23,17 @@ import org.hibernate.envers.RevisionType;
 import org.hibernate.envers.query.AuditEntity;
 
 import java.lang.reflect.Field;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.Temporal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
 @SuppressWarnings({"CdiInjectionPointsInspection"})
-public abstract class BaseService<T extends BaseEntity, UUID, R extends Repository<T, UUID>, M extends BaseMapper<T>>
-        implements Service<T, UUID> {
+public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Repository<T, UUID>, M extends BaseMapper<T>>
+        implements Service<T, DTO, UUID> {
 
     @Getter
     @Inject
@@ -45,37 +46,36 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
 
     @Transactional
     @Override
-    public T save(T entity) {
+    public DTO save(T entity) {
         this.repository.persist(entity);
-        return entity;
+        return mapper.toDto(entity);
     }
 
     @Override
-    public T findById(UUID uuid) {
-        Optional<T> entity = this.repository.findByIdOptional(uuid);
-        if (entity.isEmpty()) {
-            throw new NotFoundException("Entity not found");
-        }
-        return entity.get();
+    public DTO findById(UUID uuid) {
+        T entity = this.repository.findByIdOptional(uuid).orElseThrow(() -> new NotFoundException("Entity not found"));
+        return this.mapper.toDto(entity);
     }
 
     @Override
-    public List<T> findAll() {
-        return this.repository.listAll();
+    public List<DTO> findAll() {
+        return this.mapper.toDto(this.repository.listAll());
     }
 
     @Override
-    public DataPagination<T> findAll(Pageable pageable) {
-        return this.findAllPaginated(pageable);
+    public DataPagination<DTO> findAll(Pageable pageable) {
+        return mapper.toDto(this.repository.listAll(pageable));
     }
 
     @Transactional
     @Override
-    public T updateById(T entity, UUID uuid) {
-        T databaseEntity = this.findById(uuid);
+    public DTO updateById(T entity, UUID uuid) {
+        T databaseEntity = this.repository
+                .findByIdOptional(uuid)
+                .orElseThrow(() -> new NotFoundException("Entity not found"));
         this.mapper.copyProperties(entity, databaseEntity);
         repository.getEntityManager().merge(databaseEntity);
-        return databaseEntity;
+        return this.mapper.toDto(databaseEntity);
     }
 
     @Transactional
@@ -93,12 +93,12 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
     }
 
     public DataPagination<T> findAllPaginated(Pageable pageable) {
-        return this.repository.findAll(pageable);
+        return this.repository.listAll(pageable);
     }
 
     @Transactional
     @Override
-    public <DTO> List<Revision<DTO>> findAllRevisions(UUID entityId) {
+    public List<Revision<DTO>> findAllRevisions(UUID entityId) {
         AuditReader reader = AuditReaderFactory.get(getRepository().getEntityManager());
         List<Number> revisionsNumbers = reader.getRevisions(entityType, entityId);
         List<Revision<DTO>> revisionList = new ArrayList<>();
@@ -172,7 +172,7 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
         return comparison;
     }
 
-    private <DTO> List<FieldChange> generateFieldChangesForCreation(DTO currentEntity) {
+    private List<FieldChange> generateFieldChangesForCreation(DTO currentEntity) {
         List<FieldChange> fieldChanges = new ArrayList<>();
         if (currentEntity == null) {
             return fieldChanges;
@@ -223,7 +223,7 @@ public abstract class BaseService<T extends BaseEntity, UUID, R extends Reposito
         return fieldChanges;
     }
 
-    private <DTO> List<FieldChange> compareEntities(DTO previousEntity, DTO currentEntity) {
+    private List<FieldChange> compareEntities(Object previousEntity, Object currentEntity) {
         List<FieldChange> fieldChanges = new ArrayList<>();
         if (previousEntity == null || currentEntity == null) {
             return fieldChanges;

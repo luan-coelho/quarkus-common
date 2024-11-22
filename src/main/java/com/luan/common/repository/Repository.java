@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Repository<T, UUID> implements PanacheRepositoryBase<T, UUID> {
 
-    public DataPagination<T> findAll(Pageable pageable) {
+    public DataPagination<T> listAll(Pageable pageable) {
         PanacheQuery<T> panacheQuery = findAll();
         return buildDataPagination(pageable, panacheQuery);
     }

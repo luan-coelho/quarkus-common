@@ -4,7 +4,10 @@ import com.luan.common.dto.user.UserResponseDto;
 import com.luan.common.mapper.BaseMapper;
 import com.luan.common.mapper.QuarkusMappingConfig;
 import com.luan.common.model.user.User;
+import com.luan.common.util.pagination.DataPagination;
 import org.mapstruct.*;
+
+import java.util.List;
 
 @Mapper(config = QuarkusMappingConfig.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper extends BaseMapper<User> {
@@ -17,5 +20,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     @Override
     UserResponseDto toDto(User targetClass);
+
+    DataPagination<UserResponseDto> toDto(DataPagination<User> target);
 
 }

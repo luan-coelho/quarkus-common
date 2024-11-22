@@ -1,5 +1,6 @@
 package com.luan.common.service.user;
 
+import com.luan.common.dto.user.UserResponseDto;
 import com.luan.common.mapper.user.UserMapper;
 import com.luan.common.model.user.Address;
 import com.luan.common.model.user.User;
@@ -11,7 +12,7 @@ import jakarta.transaction.Transactional;
 import java.util.UUID;
 
 @ApplicationScoped
-public class UserService extends BaseService<User, UUID, UserRepository, UserMapper> {
+public class UserService extends BaseService<User, UserResponseDto, UUID, UserRepository, UserMapper> {
 
     protected UserService() {
         super(User.class);
@@ -19,7 +20,7 @@ public class UserService extends BaseService<User, UUID, UserRepository, UserMap
 
     @Transactional
     @Override
-    public User save(User entity) {
+    public UserResponseDto save(User entity) {
         Address address = entity.getAddress();
         address.setUser(entity);
         return super.save(entity);
