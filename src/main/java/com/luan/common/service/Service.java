@@ -18,7 +18,7 @@ public interface Service<T, DTO, UUID> {
 
     DataPagination<DTO> findAll(Pageable pageable);
 
-    DTO updateById(T entity, UUID id);
+    DTO updateById(UUID id, T entity);
 
     void deleteById(UUID id);
 

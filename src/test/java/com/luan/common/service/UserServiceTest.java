@@ -21,6 +21,7 @@ class UserServiceTest {
 
     @Inject
     UserService service;
+
     @Inject
     ObjectMapper objectMapper;
 
@@ -58,7 +59,7 @@ class UserServiceTest {
 
         service.save(persistedUser);
         persistedUser.setName("João");
-        service.updateById(persistedUser, persistedUser.getId());
+        service.updateById(persistedUser.getId(), persistedUser);
         service.getRepository().getEntityManager().flush();
 
         ObjectMapper objectMapper = new ObjectMapper();

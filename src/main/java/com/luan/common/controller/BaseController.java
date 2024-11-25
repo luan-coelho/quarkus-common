@@ -33,7 +33,7 @@ public abstract class BaseController<T, DTO, UUID, S extends Service<T, DTO, UUI
     @Path("/{id}")
     @PUT
     public Response updateById(T entity, @PathParam("id") UUID id) {
-        return Response.ok(service.updateById(entity, id)).build();
+        return Response.ok(service.updateById(id, entity)).build();
     }
 
     @Path("/{id}")

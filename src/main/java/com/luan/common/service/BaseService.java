@@ -40,7 +40,7 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
     R repository;
 
     @Inject
-    M mapper;
+    protected M mapper;
 
     private final Class<T> entityType;
 
@@ -70,7 +70,7 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
 
     @Transactional
     @Override
-    public DTO updateById(T entity, UUID uuid) {
+    public DTO updateById( UUID uuid, T entity) {
         T databaseEntity = this.repository
                 .findByIdOptional(uuid)
                 .orElseThrow(() -> new NotFoundException("Entity not found"));
