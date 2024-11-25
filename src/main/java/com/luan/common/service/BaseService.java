@@ -32,8 +32,8 @@ import java.util.Objects;
 @Slf4j
 @RequiredArgsConstructor
 @SuppressWarnings({"CdiInjectionPointsInspection"})
-public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Repository<T, UUID>, M extends BaseMapper<T>>
-        implements Service<T, DTO, UUID> {
+public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Repository<T, UUID>,
+        M extends BaseMapper<T, DTO>> implements Service<T, DTO, UUID> {
 
     @Getter
     @Inject
@@ -64,7 +64,8 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
 
     @Override
     public DataPagination<DTO> findAll(Pageable pageable) {
-        return mapper.toDto(this.repository.listAll(pageable));
+        DataPagination<T> dataPagination = this.repository.listAll(pageable);
+        return mapper.toDto(dataPagination);
     }
 
     @Transactional

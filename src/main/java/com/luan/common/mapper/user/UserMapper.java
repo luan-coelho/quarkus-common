@@ -10,7 +10,7 @@ import org.mapstruct.*;
 import java.util.List;
 
 @Mapper(config = QuarkusMappingConfig.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface UserMapper extends BaseMapper<User> {
+public interface UserMapper extends BaseMapper<User, UserResponseDto> {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -21,6 +21,7 @@ public interface UserMapper extends BaseMapper<User> {
     @Override
     UserResponseDto toDto(User targetClass);
 
+    @Override
     DataPagination<UserResponseDto> toDto(DataPagination<User> target);
 
 }

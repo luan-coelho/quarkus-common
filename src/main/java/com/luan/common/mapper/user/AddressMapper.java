@@ -1,5 +1,6 @@
 package com.luan.common.mapper.user;
 
+import com.luan.common.dto.user.AddressResponseDto;
 import com.luan.common.mapper.BaseMapper;
 import com.luan.common.mapper.QuarkusMappingConfig;
 import com.luan.common.model.user.Address;
@@ -8,7 +9,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(config = QuarkusMappingConfig.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface AddressMapper extends BaseMapper<Address> {
+public interface AddressMapper extends BaseMapper<Address, AddressResponseDto> {
 
     void copyProperties(Address source, @MappingTarget Address target);
 

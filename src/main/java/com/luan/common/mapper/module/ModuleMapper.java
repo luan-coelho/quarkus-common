@@ -4,10 +4,13 @@ import com.luan.common.dto.module.ModuleResponseDto;
 import com.luan.common.mapper.BaseMapper;
 import com.luan.common.mapper.QuarkusMappingConfig;
 import com.luan.common.model.module.Module;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
 @Mapper(config = QuarkusMappingConfig.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface ModuleMapper extends BaseMapper<Module> {
+public interface ModuleMapper extends BaseMapper<Module, ModuleResponseDto> {
 
     @Mapping(target = "id", ignore = true)
     @Override

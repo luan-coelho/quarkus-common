@@ -5,22 +5,16 @@ import com.luan.common.util.pagination.DataPagination;
 
 import java.util.List;
 
-public interface BaseMapper<T extends BaseEntity> {
+public interface BaseMapper<T extends BaseEntity, DTO> {
 
     default void copyProperties(T source, T target) {
 
     }
 
-    default <DTO> DTO toDto(T target) {
-        return null;
-    }
+    DTO toDto(T target);
 
-    default <DTO> List<DTO> toDto(List<T> target) {
-        return null;
-    }
+    List<DTO> toDto(List<T> target);
 
-    default <DTO, E> DTO toDto(E target) {
-        return null;
-    }
+    DataPagination<DTO> toDto(DataPagination<T> target);
 
 }
