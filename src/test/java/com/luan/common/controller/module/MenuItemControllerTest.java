@@ -7,27 +7,31 @@ import com.luan.common.mapper.module.MenuItemMapper;
 import com.luan.common.model.module.MenuItem;
 import com.luan.common.service.module.MenuItemService;
 import com.luan.common.util.JsonUtils;
+import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 @QuarkusTest
 class MenuItemControllerTest extends BaseControllerTest {
 
     @Inject
     MenuItemMapper mapper;
+
     @Inject
     MenuItemService menuItemService;
 
     @Test
-    void whenCreateModule() {
+    void whenCreateMenuItem() {
         MenuItem menuItem = createMenuItem("Usuários", "/users", "fa fa-users");
 
         String json;
@@ -55,10 +59,11 @@ class MenuItemControllerTest extends BaseControllerTest {
                 .body("active", is(menuItem.isActive()));
     }
 
+    @TestTransaction
     @Test
     public void whenCreateWithParent() {
         MenuItem parent = createMenuItem("Configurações", "/settings", "fa fa-cogs");
-        menuItemService.save(parent);
+        saveParent(parent);
 
         MenuItem menuItem = createMenuItem("Usuários", "/users", "fa fa-users");
         menuItem.setParent(parent);
@@ -86,7 +91,7 @@ class MenuItemControllerTest extends BaseControllerTest {
                 .body("position", is(menuItem.getPosition()))
                 .body("visible", is(menuItem.isVisible()))
                 .body("active", is(menuItem.isActive()))
-                .body("parent.id", is(parent.getId()))
+                .body("parent.id", is(parent.getId().toString()))
                 .body("parent.label", is(parent.getLabel()))
                 .body("parent.route", is(parent.getRoute()))
                 .body("parent.icon", is(parent.getIcon()))
@@ -104,6 +109,17 @@ class MenuItemControllerTest extends BaseControllerTest {
         menuItem.setVisible(true);
         menuItem.setActive(true);
         return menuItem;
+    }
+
+    /**
+     * Responsável por salvar o menu pai em uma transação separada, para que seja visível para os testes.
+     *
+     * @param parent menu pai
+     */
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public void saveParent(MenuItem parent) {
+        menuItemService.save(parent);
+        menuItemService.getRepository().flush();
     }
 
     @Override
