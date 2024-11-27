@@ -21,6 +21,7 @@ import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.RevisionType;
 import org.hibernate.envers.query.AuditEntity;
+import org.hibernate.exception.ConstraintViolationException;
 
 import java.lang.reflect.Field;
 import java.time.temporal.Temporal;
@@ -39,8 +40,9 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
     @Inject
     R repository;
 
+    @Getter
     @Inject
-    protected M mapper;
+    M mapper;
 
     private final Class<T> entityType;
 
@@ -70,22 +72,30 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
 
     @Transactional
     @Override
-    public DTO updateById( UUID uuid, T entity) {
+    public DTO updateById(UUID uuid, T entity) {
         T databaseEntity = this.repository
                 .findByIdOptional(uuid)
                 .orElseThrow(() -> new NotFoundException("Entity not found"));
         this.mapper.copyProperties(entity, databaseEntity);
-        repository.getEntityManager().merge(databaseEntity);
+        update(databaseEntity);
         return this.mapper.toDto(databaseEntity);
+    }
+
+    @Transactional
+    public T update(T entity) {
+        return this.repository.getEntityManager().merge(entity);
     }
 
     @Transactional
     @Override
     public void deleteById(UUID uuid) {
-        if (!this.existsById(uuid)) {
-            throw new NotFoundException("Entity not found");
+        T entity = this.repository.findByIdOptional(uuid).orElseThrow(() -> new NotFoundException("Entity not found"));
+        try {
+            getRepository().getEntityManager().remove(entity);
+            getRepository().getEntityManager().flush();
+        } catch (ConstraintViolationException e) {
+            throw new IllegalStateException("Não é possível excluir o item, pois ele está sendo referenciado.");
         }
-        this.repository.deleteById(uuid);
     }
 
     @Override

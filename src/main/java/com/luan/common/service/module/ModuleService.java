@@ -26,7 +26,7 @@ public class ModuleService extends BaseService<Module, ModuleResponseDto, UUID, 
 
     public MenuItemResponseDto createMenuItem(UUID moduleId, MenuItemCreateDto dto) {
         ModuleResponseDto moduleDto = findById(moduleId);
-        Module module = mapper.toEntity(moduleDto);
+        Module module = getMapper().toEntity(moduleDto);
         MenuItem entity = menuItemMapper.toEntity(dto);
         module.getMenuItems().add(entity);
         updateById(moduleId, module);

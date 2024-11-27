@@ -20,7 +20,6 @@ public class MenuItem extends BaseEntity {
     private String route;
     private String icon;
     private Integer position;
-    private boolean visible;
 
     @OneToOne
     private MenuItem parent;

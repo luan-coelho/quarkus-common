@@ -41,7 +41,6 @@ class ModuleControllerTest extends BaseControllerTest {
         menuItemParent.setRoute("/users");
         menuItemParent.setIcon("fa fa-users");
         menuItemParent.setPosition(1);
-        menuItemParent.setVisible(true);
         menuItemParent.setActive(true);
 
         MenuItem menuItem = new MenuItem();
@@ -49,7 +48,6 @@ class ModuleControllerTest extends BaseControllerTest {
         menuItem.setRoute("/employees");
         menuItem.setIcon("fa fa-users");
         menuItem.setPosition(1);
-        menuItem.setVisible(true);
         menuItem.setActive(true);
         menuItem.setParent(menuItemParent);
 
@@ -89,7 +87,6 @@ class ModuleControllerTest extends BaseControllerTest {
                 .body("menuItems[0].route", is(menuItem.getRoute()))
                 .body("menuItems[0].icon", is(menuItem.getIcon()))
                 .body("menuItems[0].position", is(menuItem.getPosition()))
-                .body("menuItems[0].visible", is(menuItem.isVisible()))
                 .body("menuItems[0].active", is(menuItem.isActive()))
                 .body("menuItems[0].parent", is(nullValue()))
                 .body("users", hasSize(1))

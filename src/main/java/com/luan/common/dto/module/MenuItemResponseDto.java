@@ -13,7 +13,6 @@ public record MenuItemResponseDto(
         String icon,
         Integer position,
         MenuItemResponseDto parent,
-        boolean visible,
         boolean active) implements Serializable {
 
 }

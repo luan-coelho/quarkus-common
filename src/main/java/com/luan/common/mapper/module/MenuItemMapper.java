@@ -5,14 +5,15 @@ import com.luan.common.dto.module.MenuItemResponseDto;
 import com.luan.common.mapper.BaseMapper;
 import com.luan.common.mapper.QuarkusMappingConfig;
 import com.luan.common.model.module.MenuItem;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 
 @Mapper(config = QuarkusMappingConfig.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MenuItemMapper extends BaseMapper<MenuItem, MenuItemResponseDto> {
 
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "parent", expression = "java(source.getParent())")
     @Mapping(target = "id", ignore = true)
     @Override
     void copyProperties(MenuItem source, @MappingTarget MenuItem target);
