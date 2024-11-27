@@ -37,18 +37,6 @@ public class MenuItemService extends BaseService<MenuItem, MenuItemResponseDto, 
         return getMapper().toDto(update(menuItem));
     }
 
-    public void copyProperties(MenuItem source, MenuItem target) {
-        if (source == null) {
-            return;
-        }
-        target.setParent(source.getParent());
-        target.setLabel(source.getLabel());
-        target.setRoute(source.getRoute());
-        target.setIcon(source.getIcon());
-        target.setPosition(source.getPosition());
-        target.setActive(source.isActive());
-    }
-
     @Transactional
     public void validateParent(MenuItem entity) {
         if (entity.getParent() != null && entity.getParent().getId() != null) {
