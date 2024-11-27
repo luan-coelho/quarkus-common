@@ -19,8 +19,7 @@ public class UserService extends BaseService<User, UserResponseDto, UUID, UserRe
     }
 
     @Transactional
-    @Override
-    public UserResponseDto save(User entity) {
+    public User save(User entity) {
         Address address = entity.getAddress();
         address.setUser(entity);
         return super.save(entity);

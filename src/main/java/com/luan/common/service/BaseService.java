@@ -34,7 +34,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @SuppressWarnings({"CdiInjectionPointsInspection"})
 public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Repository<T, UUID>,
-        M extends BaseMapper<T, DTO>> implements Service<T, DTO, UUID> {
+        M extends BaseMapper<T, DTO>> implements Service<T, UUID> {
 
     @Getter
     @Inject
@@ -48,37 +48,35 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
 
     @Transactional
     @Override
-    public DTO save(T entity) {
+    public T save(T entity) {
         this.repository.persist(entity);
-        return mapper.toDto(entity);
+        return entity;
     }
 
     @Override
-    public DTO findById(UUID uuid) {
-        T entity = this.repository.findByIdOptional(uuid).orElseThrow(() -> new NotFoundException("Entity not found"));
-        return this.mapper.toDto(entity);
+    public T findById(UUID uuid) {
+        return this.repository
+                .findByIdOptional(uuid)
+                .orElseThrow(() -> new NotFoundException("Entidade não encontrada"));
     }
 
     @Override
-    public List<DTO> findAll() {
-        return this.mapper.toDto(this.repository.listAll());
+    public List<T> findAll() {
+        return this.repository.listAll();
     }
 
     @Override
-    public DataPagination<DTO> findAll(Pageable pageable) {
-        DataPagination<T> dataPagination = this.repository.listAll(pageable);
-        return mapper.toDto(dataPagination);
+    public DataPagination<T> findAll(Pageable pageable) {
+        return this.repository.listAll(pageable);
     }
 
     @Transactional
     @Override
-    public DTO updateById(UUID uuid, T entity) {
-        T databaseEntity = this.repository
-                .findByIdOptional(uuid)
-                .orElseThrow(() -> new NotFoundException("Entity not found"));
+    public T updateById(UUID uuid, T entity) {
+        T databaseEntity = findById(uuid);
         this.mapper.copyProperties(entity, databaseEntity);
         update(databaseEntity);
-        return this.mapper.toDto(databaseEntity);
+        return databaseEntity;
     }
 
     @Transactional
@@ -109,17 +107,16 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
 
     @Transactional
     @Override
-    public List<Revision<DTO>> findAllRevisions(UUID entityId) {
+    public List<Revision<T>> findAllRevisions(UUID entityId) {
         AuditReader reader = AuditReaderFactory.get(getRepository().getEntityManager());
         List<Number> revisionsNumbers = reader.getRevisions(entityType, entityId);
-        List<Revision<DTO>> revisionList = new ArrayList<>();
+        List<Revision<T>> revisionList = new ArrayList<>();
         for (Number revisionNumber : revisionsNumbers) {
             T entity = reader.find(entityType, entityId, revisionNumber.intValue());
-            DTO entityDto = mapper.toDto(entity);
-            Revision<DTO> revisionObj = new Revision<>();
+            Revision<T> revisionObj = new Revision<>();
             revisionObj.setRevisionId(revisionNumber);
             revisionObj.setRevisionType(getRevisionType(reader, entityId, revisionNumber));
-            revisionObj.setEntity(entityDto);
+            revisionObj.setEntity(entity);
             revisionList.add(revisionObj);
         }
         return revisionList;

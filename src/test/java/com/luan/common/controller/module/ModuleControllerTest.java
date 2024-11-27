@@ -7,12 +7,15 @@ import com.luan.common.model.module.MenuItem;
 import com.luan.common.model.module.Module;
 import com.luan.common.model.user.Address;
 import com.luan.common.model.user.User;
+import com.luan.common.service.module.MenuItemService;
 import com.luan.common.service.module.ModuleService;
 import com.luan.common.service.user.UserService;
 import com.luan.common.util.JsonUtils;
+import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
@@ -22,6 +25,9 @@ import java.util.ArrayList;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
+/**
+ * Test for {@link com.luan.common.controller.module.ModuleController}.
+ */
 @QuarkusTest
 class ModuleControllerTest extends BaseControllerTest {
 
@@ -34,34 +40,16 @@ class ModuleControllerTest extends BaseControllerTest {
     @Inject
     UserService userService;
 
+    @Inject
+    MenuItemService menuItemService;
+
     @Test
-    void whenCreateModule() {
-        MenuItem menuItemParent = new MenuItem();
-        menuItemParent.setLabel("Usuários");
-        menuItemParent.setRoute("/users");
-        menuItemParent.setIcon("fa fa-users");
-        menuItemParent.setPosition(1);
-        menuItemParent.setActive(true);
-
-        MenuItem menuItem = new MenuItem();
-        menuItem.setLabel("Funcionários");
-        menuItem.setRoute("/employees");
-        menuItem.setIcon("fa fa-users");
-        menuItem.setPosition(1);
-        menuItem.setActive(true);
-        menuItem.setParent(menuItemParent);
-
+    public void whenCreateModule() {
         Module module = new Module();
         module.setName("Gestão de Usuários");
         module.setMenuItems(new ArrayList<>());
-        module.getMenuItems().add(menuItem);
-
-        User user = createUser();
-        userService.save(user);
-        user.getModules().add(module);
-
         module.setUsers(new ArrayList<>());
-        module.getUsers().add(user);
+        module.setActive(true);
 
         String json;
         try {
@@ -75,10 +63,94 @@ class ModuleControllerTest extends BaseControllerTest {
                 .header("Content-Type", MediaType.APPLICATION_JSON)
                 .body(json)
                 .when()
-                .post("/module")
+                .post(getUrl())
                 .then()
                 .log().all()
                 .statusCode(Response.Status.CREATED.getStatusCode())
+                .body("id", is(notNullValue()))
+                .body("name", is(module.getName()))
+                .body("menuItems", hasSize(0))
+                .body("users", hasSize(0))
+                .body("active", is(module.isActive()));
+    }
+
+    @Test
+    public void whenAddUserToModule() {
+        Module module = new Module();
+        module.setName("Gestão de Usuários");
+        module.setMenuItems(new ArrayList<>());
+        module.setUsers(new ArrayList<>());
+        module.setActive(true);
+        moduleService.save(module);
+
+        User user = createUser();
+        userService.save(user);
+
+        given().contentType(ContentType.JSON)
+                .header("Content-Type", MediaType.APPLICATION_JSON)
+                .when()
+                .patch("/module/{id}/add-user/{userId}", module.getId(), user.getId())
+                .then()
+                .log().all()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .body("id", is(notNullValue()))
+                .body("name", is(module.getName()))
+                .body("menuItems", hasSize(0))
+                .body("users", hasSize(1))
+                .body("users[0].id", is(notNullValue()))
+                .body("users[0].name", is(user.getName()))
+                .body("users[0].email", is(user.getEmail()))
+                .body("active", is(module.isActive()));
+    }
+
+    @TestTransaction
+    @Test
+    public void whenAddLinkedUserToModule() {
+        Module module = new Module();
+        module.setName("Gestão de Usuários");
+        module.setMenuItems(new ArrayList<>());
+        module.setUsers(new ArrayList<>());
+        module.setActive(true);
+        saveInAnotherTransaction(module);
+
+        User user = createUser();
+        saveInAnotherTransaction(user);
+        addUserToModuleInAnotherTransaction(module, user);
+
+        given().contentType(ContentType.JSON)
+                .header("Content-Type", MediaType.APPLICATION_JSON)
+                .when()
+                .patch("/module/{id}/add-user/{userId}", module.getId(), user.getId())
+                .then()
+                .log().all()
+                .statusCode(Response.Status.BAD_REQUEST.getStatusCode())
+                .body("title", is("Bad Request"));
+    }
+
+    @Test
+    public void whenAddMenuItemToModule() {
+        Module module = new Module();
+        module.setName("Gestão de Usuários");
+        module.setMenuItems(new ArrayList<>());
+        module.setUsers(new ArrayList<>());
+        module.setActive(true);
+        saveInAnotherTransaction(module);
+
+        MenuItem menuItem = new MenuItem();
+        menuItem.setLabel("Usuários");
+        menuItem.setRoute("/users");
+        menuItem.setIcon("fa fa-users");
+        menuItem.setPosition(1);
+        menuItem.setActive(true);
+        saveInAnotherTransaction(menuItem);
+
+        given().contentType(ContentType.JSON)
+                .header("Content-Type", MediaType.APPLICATION_JSON)
+                .when()
+                .patch("/module/{id}/add-menu-item/{menuItemId}", module.getId(), menuItem.getId())
+                .then()
+                .log().all()
+                .statusCode(Response.Status.OK.getStatusCode())
                 .body("id", is(notNullValue()))
                 .body("name", is(module.getName()))
                 .body("menuItems", hasSize(1))
@@ -89,11 +161,31 @@ class ModuleControllerTest extends BaseControllerTest {
                 .body("menuItems[0].position", is(menuItem.getPosition()))
                 .body("menuItems[0].active", is(menuItem.isActive()))
                 .body("menuItems[0].parent", is(nullValue()))
-                .body("users", hasSize(1))
-                .body("users[0].id", is(notNullValue()))
-                .body("users[0].name", is(user.getName()))
-                .body("users[0].email", is(user.getEmail()))
                 .body("active", is(module.isActive()));
+    }
+
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    protected void addUserToModuleInAnotherTransaction(Module module, User user) {
+        moduleService.addUser(module.getId(), user.getId());
+        moduleService.getRepository().getEntityManager().flush();
+    }
+
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    protected void saveInAnotherTransaction(Module module) {
+        moduleService.save(module);
+        moduleService.getRepository().getEntityManager().flush();
+    }
+
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    protected void saveInAnotherTransaction(User user) {
+        userService.save(user);
+        userService.getRepository().getEntityManager().flush();
+    }
+
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    protected void saveInAnotherTransaction(MenuItem menuItem) {
+        menuItemService.save(menuItem);
+        menuItemService.getRepository().getEntityManager().flush();
     }
 
     private User createUser() {

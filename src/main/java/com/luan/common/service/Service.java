@@ -8,23 +8,23 @@ import com.luan.common.util.pagination.Pageable;
 import java.util.Collection;
 import java.util.List;
 
-public interface Service<T, DTO, UUID> {
+public interface Service<T, UUID> {
 
-    DTO save(T entity);
+    T save(T entity);
 
-    DTO findById(UUID id);
+    T findById(UUID id);
 
-    Collection<DTO> findAll();
+    Collection<T> findAll();
 
-    DataPagination<DTO> findAll(Pageable pageable);
+    DataPagination<T> findAll(Pageable pageable);
 
-    DTO updateById(UUID id, T entity);
+    T updateById(UUID id, T entity);
 
     void deleteById(UUID id);
 
     boolean existsById(UUID id);
 
-    List<Revision<DTO>> findAllRevisions(UUID id);
+    List<Revision<T>> findAllRevisions(UUID id);
 
     RevisionComparison compareWithPreviousRevision(UUID entityId, Integer revisionId);
 

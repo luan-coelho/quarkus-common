@@ -21,20 +21,19 @@ public class MenuItemService extends BaseService<MenuItem, MenuItemResponseDto, 
     }
 
     @Transactional
-    @Override
-    public MenuItemResponseDto save(MenuItem entity) {
+    public MenuItem save(MenuItem entity) {
         validateParent(entity);
         return super.save(entity);
     }
 
     @Transactional
-    public MenuItemResponseDto updateById(UUID id, MenuItem entity) {
+    public MenuItem updateById(UUID id, MenuItem entity) {
         MenuItem menuItem = getRepository()
                 .findByIdOptional(id)
                 .orElseThrow(() -> new NotFoundException("Menu não encontrado"));
         validateParent(entity);
         getMapper().copyProperties(entity, menuItem);
-        return getMapper().toDto(update(menuItem));
+        return update(menuItem);
     }
 
     @Transactional

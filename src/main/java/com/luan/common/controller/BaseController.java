@@ -1,39 +1,53 @@
 package com.luan.common.controller;
 
+import com.luan.common.mapper.BaseMapper;
+import com.luan.common.model.user.BaseEntity;
 import com.luan.common.service.Service;
+import com.luan.common.util.pagination.DataPagination;
 import com.luan.common.util.pagination.Pageable;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import lombok.Getter;
 
+@Getter
 @Produces(MediaType.APPLICATION_JSON)
 @SuppressWarnings({"CdiInjectionPointsInspection", "RestParamTypeInspection"})
-public abstract class BaseController<T, DTO, UUID, S extends Service<T, DTO, UUID>> {
+public abstract class BaseController<T extends BaseEntity, DTO, UUID, S extends Service<T, UUID>, M extends BaseMapper<T, DTO>> {
 
     @Inject
     S service;
 
+    @Inject
+    M mapper;
+
     @GET
     public Response getAll(Pageable pageable) {
-        return Response.ok(service.findAll(pageable)).build();
+        DataPagination<T> dataPagination = service.findAll(pageable);
+        DataPagination<DTO> dto = mapper.toDto(dataPagination);
+        return Response.ok(dto).build();
     }
 
     @Path("/{id}")
     @GET
     public Response getById(@PathParam("id") UUID id) {
-        return Response.ok(service.findById(id)).build();
+        DTO dto = mapper.toDto(service.findById(id));
+        return Response.ok(dto).build();
     }
 
     @POST
     public Response save(T entity) {
-        return Response.status(Response.Status.CREATED).entity(service.save(entity)).build();
+        service.save(entity);
+        DTO dto = mapper.toDto(entity);
+        return Response.status(Response.Status.CREATED).entity(dto).build();
     }
 
     @Path("/{id}")
     @PUT
     public Response updateById(T entity, @PathParam("id") UUID id) {
-        return Response.ok(service.updateById(id, entity)).build();
+        DTO dto = mapper.toDto(service.updateById(id, entity));
+        return Response.ok(dto).build();
     }
 
     @Path("/{id}")
