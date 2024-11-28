@@ -2,7 +2,7 @@ package com.luan.common.model.module;
 
 import com.luan.common.model.user.BaseEntity;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class MenuItem extends BaseEntity {
     private String icon;
     private Integer position;
 
-    @OneToOne
+    @ManyToOne
     private MenuItem parent;
 
 }

@@ -11,7 +11,7 @@ public class HibernateConstraintViolationExceptionMapper extends HandleException
 
     @Override
     public String getTitle() {
-        return "Violação de restrição";
+        return "Conflito de dados";
     }
 
     @Override

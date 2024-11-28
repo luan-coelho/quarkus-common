@@ -124,7 +124,10 @@ class ModuleControllerTest extends BaseControllerTest {
                 .then()
                 .log().all()
                 .statusCode(Response.Status.BAD_REQUEST.getStatusCode())
-                .body("title", is("Bad Request"));
+                .body("title", is("Argumento inválido"))
+                .body("status", is(Response.Status.BAD_REQUEST.getStatusCode()))
+                .body("detail", is("Usuário já vinculado ao módulo"))
+                .body("instance", containsString("/module/" + module.getId() + "/add-user/" + user.getId()));
     }
 
     @Test
@@ -164,9 +167,46 @@ class ModuleControllerTest extends BaseControllerTest {
                 .body("active", is(module.isActive()));
     }
 
+    @Test
+    public void whenAddLinkedMenuItemToModule() {
+        Module module = new Module();
+        module.setName("Gestão de Usuários");
+        module.setMenuItems(new ArrayList<>());
+        module.setUsers(new ArrayList<>());
+        module.setActive(true);
+        saveInAnotherTransaction(module);
+
+        MenuItem menuItem = new MenuItem();
+        menuItem.setLabel("Usuários");
+        menuItem.setRoute("/users");
+        menuItem.setIcon("fa fa-users");
+        menuItem.setPosition(1);
+        menuItem.setActive(true);
+        saveInAnotherTransaction(menuItem);
+        addMenuItemToModuleInAnotherTransaction(module, menuItem);
+
+        given().contentType(ContentType.JSON)
+                .header("Content-Type", MediaType.APPLICATION_JSON)
+                .when()
+                .patch("/module/{id}/add-menu-item/{menuItemId}", module.getId(), menuItem.getId())
+                .then()
+                .log().all()
+                .statusCode(Response.Status.BAD_REQUEST.getStatusCode())
+                .body("title", is("Argumento inválido"))
+                .body("status", is(Response.Status.BAD_REQUEST.getStatusCode()))
+                .body("detail", is("Item de menu já vinculado ao módulo"))
+                .body("instance", containsString("/module/" + module.getId() + "/add-menu-item/" + menuItem.getId()));
+    }
+
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     protected void addUserToModuleInAnotherTransaction(Module module, User user) {
         moduleService.addUser(module.getId(), user.getId());
+        moduleService.getRepository().getEntityManager().flush();
+    }
+
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    protected void addMenuItemToModuleInAnotherTransaction(Module module, MenuItem menuItem) {
+        moduleService.addMenuItem(module.getId(), menuItem.getId());
         moduleService.getRepository().getEntityManager().flush();
     }
 

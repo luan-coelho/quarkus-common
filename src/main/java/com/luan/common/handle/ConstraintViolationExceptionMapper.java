@@ -13,7 +13,7 @@ public class ConstraintViolationExceptionMapper extends HandleExceptionMapper<Co
 
     @Override
     public String getTitle() {
-        return HttpResponseStatus.BAD_REQUEST.reasonPhrase();
+        return "Requisição inválida";
     }
 
     @Override

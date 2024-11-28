@@ -10,7 +10,7 @@ public class IllegalArgumentExceptionMapper extends HandleExceptionMapper<Illega
 
     @Override
     public String getTitle() {
-        return HttpResponseStatus.BAD_REQUEST.reasonPhrase();
+        return "Argumento inválido";
     }
 
     @Override

@@ -9,7 +9,7 @@ public class GlobalHandleExceptionMapper extends HandleExceptionMapper<Exception
         implements ExceptionMapper<Exception> {
 
     public String getTitle() {
-        return HttpResponseStatus.INTERNAL_SERVER_ERROR.reasonPhrase();
+        return "Erro Interno do Servidor";
     }
 
     public int getStatus() {

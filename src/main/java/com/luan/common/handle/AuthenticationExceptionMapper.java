@@ -11,7 +11,7 @@ public class AuthenticationExceptionMapper extends HandleExceptionMapper<Authent
 
     @Override
     public String getTitle() {
-        return HttpResponseStatus.UNAUTHORIZED.reasonPhrase();
+        return "Não autorizado";
     }
 
     @Override

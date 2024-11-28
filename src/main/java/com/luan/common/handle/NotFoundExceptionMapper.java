@@ -11,7 +11,7 @@ public class NotFoundExceptionMapper extends HandleExceptionMapper<NotFoundExcep
 
     @Override
     public String getTitle() {
-        return HttpResponseStatus.NOT_FOUND.reasonPhrase();
+        return "Recurso não encontrado";
     }
 
     @Override
