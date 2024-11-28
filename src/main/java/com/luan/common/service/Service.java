@@ -8,17 +8,27 @@ import com.luan.common.util.pagination.Pageable;
 import java.util.Collection;
 import java.util.List;
 
-public interface Service<T, UUID> {
+public interface Service<T, DTO, UUID> {
 
     T save(T entity);
 
+    DTO saveAndReturnDto(T entity);
+
     T findById(UUID id);
+
+    DTO findByIdAndReturnDto(UUID id);
 
     Collection<T> findAll();
 
+    Collection<DTO> findAllAndReturnDto();
+
     DataPagination<T> findAll(Pageable pageable);
 
+    DataPagination<DTO> findAllAndReturnDto(Pageable pageable);
+
     T updateById(UUID id, T entity);
+
+    DTO updateByIdAndReturnDto(UUID id, T entity);
 
     void deleteById(UUID id);
 

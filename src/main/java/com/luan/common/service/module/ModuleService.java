@@ -36,7 +36,7 @@ public class ModuleService extends BaseService<Module, ModuleResponseDto, UUID, 
     }
 
     @Transactional
-    public Module addUser(UUID moduleId, UUID userId) {
+    public ModuleResponseDto addUser(UUID moduleId, UUID userId) {
         Module module = findById(moduleId);
         List<User> users = module.getUsers();
         if (users != null && !users.isEmpty()) {
@@ -47,11 +47,12 @@ public class ModuleService extends BaseService<Module, ModuleResponseDto, UUID, 
         User user = userService.findById(userId);
         user.getModules().add(module);
         module.getUsers().add(user);
-        return update(module);
+        update(module);
+        return getMapper().toDto(module);
     }
 
     @Transactional
-    public Module addMenuItem(UUID moduleId, UUID menuItemId) {
+    public ModuleResponseDto addMenuItem(UUID moduleId, UUID menuItemId) {
         Module module = findById(moduleId);
         List<MenuItem> menuItems = module.getMenuItems();
         if (menuItems != null && !menuItems.isEmpty()) {
@@ -61,8 +62,8 @@ public class ModuleService extends BaseService<Module, ModuleResponseDto, UUID, 
         }
         MenuItem menuItem = menuItemService.findById(menuItemId);
         module.getMenuItems().add(menuItem);
-//        Hibernate.initialize(module.getUsers());
-        return update(module);
+        update(module);
+        return getMapper().toDto(module);
     }
 
 }

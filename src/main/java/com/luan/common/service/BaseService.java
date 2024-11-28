@@ -34,7 +34,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @SuppressWarnings({"CdiInjectionPointsInspection"})
 public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Repository<T, UUID>,
-        M extends BaseMapper<T, DTO>> implements Service<T, UUID> {
+        M extends BaseMapper<T, DTO>> implements Service<T, DTO, UUID> {
 
     @Getter
     @Inject
@@ -54,10 +54,20 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
     }
 
     @Override
+    public DTO saveAndReturnDto(T entity) {
+        return this.mapper.toDto(save(entity));
+    }
+
+    @Override
     public T findById(UUID uuid) {
         return this.repository
                 .findByIdOptional(uuid)
                 .orElseThrow(() -> new NotFoundException("Entidade não encontrada"));
+    }
+
+    @Override
+    public DTO findByIdAndReturnDto(UUID uuid) {
+        return this.mapper.toDto(findById(uuid));
     }
 
     @Override
@@ -66,8 +76,18 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
     }
 
     @Override
+    public List<DTO> findAllAndReturnDto() {
+        return this.mapper.toDto(findAll());
+    }
+
+    @Override
     public DataPagination<T> findAll(Pageable pageable) {
         return this.repository.listAll(pageable);
+    }
+
+    @Override
+    public DataPagination<DTO> findAllAndReturnDto(Pageable pageable) {
+        return this.mapper.toDto(findAll(pageable));
     }
 
     @Transactional
@@ -77,6 +97,12 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
         this.mapper.copyProperties(entity, databaseEntity);
         update(databaseEntity);
         return databaseEntity;
+    }
+
+    @Transactional
+    @Override
+    public DTO updateByIdAndReturnDto(UUID uuid, T entity) {
+        return this.mapper.toDto(updateById(uuid, entity));
     }
 
     @Transactional

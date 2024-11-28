@@ -3,7 +3,6 @@ package com.luan.common.controller;
 import com.luan.common.mapper.BaseMapper;
 import com.luan.common.model.user.BaseEntity;
 import com.luan.common.service.Service;
-import com.luan.common.util.pagination.DataPagination;
 import com.luan.common.util.pagination.Pageable;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -14,7 +13,7 @@ import lombok.Getter;
 @Getter
 @Produces(MediaType.APPLICATION_JSON)
 @SuppressWarnings({"CdiInjectionPointsInspection", "RestParamTypeInspection"})
-public abstract class BaseController<T extends BaseEntity, DTO, UUID, S extends Service<T, UUID>, M extends BaseMapper<T, DTO>> {
+public abstract class BaseController<T extends BaseEntity, DTO, UUID, S extends Service<T, DTO, UUID>, M extends BaseMapper<T, DTO>> {
 
     @Inject
     S service;
@@ -24,30 +23,24 @@ public abstract class BaseController<T extends BaseEntity, DTO, UUID, S extends 
 
     @GET
     public Response getAll(Pageable pageable) {
-        DataPagination<T> dataPagination = service.findAll(pageable);
-        DataPagination<DTO> dto = mapper.toDto(dataPagination);
-        return Response.ok(dto).build();
+        return Response.ok(service.findAllAndReturnDto(pageable)).build();
     }
 
     @Path("/{id}")
     @GET
     public Response getById(@PathParam("id") UUID id) {
-        DTO dto = mapper.toDto(service.findById(id));
-        return Response.ok(dto).build();
+        return Response.ok(service.findByIdAndReturnDto(id)).build();
     }
 
     @POST
     public Response save(T entity) {
-        service.save(entity);
-        DTO dto = mapper.toDto(entity);
-        return Response.status(Response.Status.CREATED).entity(dto).build();
+        return Response.status(Response.Status.CREATED).entity(service.saveAndReturnDto(entity)).build();
     }
 
     @Path("/{id}")
     @PUT
     public Response updateById(T entity, @PathParam("id") UUID id) {
-        DTO dto = mapper.toDto(service.updateById(id, entity));
-        return Response.ok(dto).build();
+        return Response.ok(service.updateByIdAndReturnDto(id, entity)).build();
     }
 
     @Path("/{id}")
@@ -59,13 +52,13 @@ public abstract class BaseController<T extends BaseEntity, DTO, UUID, S extends 
 
     @Path("/{id}/revisions")
     @GET
-    public Response findAllRevisions(UUID id) {
+    public Response findAllRevisions(@PathParam("id") UUID id) {
         return Response.ok(service.findAllRevisions(id)).build();
     }
 
     @Path("/{id}/revisions/{revision}/compare")
     @GET
-    public Response compareWithRevision(UUID id, Integer revision) {
+    public Response compareWithRevision(@PathParam("id") UUID id, @PathParam("revision") Integer revision) {
         return Response.ok(service.compareWithPreviousRevision(id, revision)).build();
     }
 

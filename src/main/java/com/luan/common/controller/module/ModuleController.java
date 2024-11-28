@@ -18,17 +18,13 @@ public class ModuleController extends BaseController<Module, ModuleResponseDto, 
     @Path("/{id}/add-user/{userId}")
     @PATCH
     public Response addUser(@PathParam("id") UUID id, @PathParam("userId") UUID userId) {
-        Module module = getService().addUser(id, userId);
-        ModuleResponseDto dto = getMapper().toDto(module);
-        return Response.ok(dto).build();
+        return Response.ok(getService().addUser(id, userId)).build();
     }
 
     @Path("/{id}/add-menu-item/{menuItemId}")
     @PATCH
     public Response addMenuItem(@PathParam("id") UUID id, @PathParam("menuItemId") UUID menuItemId) {
-        Module module = getService().addMenuItem(id, menuItemId);
-        ModuleResponseDto dto = getMapper().toDto(module);
-        return Response.ok(dto).build();
+        return Response.ok(getService().addMenuItem(id, menuItemId)).build();
     }
 
 }
