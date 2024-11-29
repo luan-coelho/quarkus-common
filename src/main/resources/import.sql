@@ -1,5 +1,42 @@
 CREATE SCHEMA IF NOT EXISTS audit;
 
+-- Inserir módulo
+INSERT INTO module (active, version, createdat, updatedat, id, name)
+VALUES (true, 1, NOW(), NOW(), '123e4567-e89b-12d3-a456-426614174000', 'Meu Módulo');
+
+-- Inserir menu items
+-- Menu Item: Inicio
+INSERT INTO menu_item (active, position, version, createdat, updatedat, id, parent_id, icon, label, route)
+VALUES (true, 1, 1, NOW(), NOW(), '123e4567-e89b-12d3-a456-426614174001', NULL, 'house', 'Inicio', '#');
+
+-- Menu Item: Dashboard
+INSERT INTO menu_item (active, position, version, createdat, updatedat, id, parent_id, icon, label, route)
+VALUES (true, 2, 1, NOW(), NOW(), '123e4567-e89b-12d3-a456-426614174002', NULL, 'circle-gauge', 'Dashboard', '/dashboard');
+
+-- Menu Item: Configurações
+INSERT INTO menu_item (active, position, version, createdat, updatedat, id, parent_id, icon, label, route)
+VALUES (true, 3, 1, NOW(), NOW(), '123e4567-e89b-12d3-a456-426614174003', NULL, 'settings', 'Configurações', NULL);
+
+-- Sub Item: Perfil
+INSERT INTO menu_item (active, position, version, createdat, updatedat, id, parent_id, icon, label, route)
+VALUES (true, 1, 1, NOW(), NOW(), '123e4567-e89b-12d3-a456-426614174004', '123e4567-e89b-12d3-a456-426614174003', 'user-pen', 'Perfil', '/dashboard/profile');
+
+-- Sub Item: Conta
+INSERT INTO menu_item (active, position, version, createdat, updatedat, id, parent_id, icon, label, route)
+VALUES (true, 2, 1, NOW(), NOW(), '123e4567-e89b-12d3-a456-426614174005', '123e4567-e89b-12d3-a456-426614174003', 'briefcase-business', 'Conta', '#');
+
+-- Menu Item: Notificações
+INSERT INTO menu_item (active, position, version, createdat, updatedat, id, parent_id, icon, label, route)
+VALUES (true, 4, 1, NOW(), NOW(), '123e4567-e89b-12d3-a456-426614174006', NULL, 'bell', 'Notificações', '#');
+
+-- Relacionar módulo com os itens de menu
+INSERT INTO module_menu_item (module_id, menuitems_id)
+VALUES
+    ('123e4567-e89b-12d3-a456-426614174000', '123e4567-e89b-12d3-a456-426614174001'),
+    ('123e4567-e89b-12d3-a456-426614174000', '123e4567-e89b-12d3-a456-426614174002'),
+    ('123e4567-e89b-12d3-a456-426614174000', '123e4567-e89b-12d3-a456-426614174003'),
+    ('123e4567-e89b-12d3-a456-426614174000', '123e4567-e89b-12d3-a456-426614174006');
+
 -- Novo módulo
 INSERT INTO module (active, version, createdat, updatedat, id, name)
 VALUES (true, 1, NOW(), NOW(), '223e4567-e89b-12d3-a456-426614174000', 'Outro Módulo');

@@ -9,7 +9,7 @@ import lombok.Setter;
 public final class Pageable {
 
     @QueryParam("page")
-    private int page = 0;
+    private int page = 1;
     @QueryParam("size")
     private int size = Pagination.STANDARD_PAGE_SIZE;
     @QueryParam("sort")

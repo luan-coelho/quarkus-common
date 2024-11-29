@@ -18,7 +18,7 @@ public class Repository<T, UUID> implements PanacheRepositoryBase<T, UUID> {
 
     public DataPagination<T> buildDataPagination(Pageable pageable, PanacheQuery<T> panacheQuery) {
         Pagination pagination = buildPaginationFromPageable(pageable, panacheQuery);
-        panacheQuery.page(Page.of(pageable.getPage(), pageable.getSize()));
+        panacheQuery.page(Page.of(pageable.getPage() - 1, pageable.getSize()));
         List<T> list = panacheQuery.list();
         return new DataPagination<>(list, pagination);
     }
