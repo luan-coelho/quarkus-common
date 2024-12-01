@@ -159,6 +159,7 @@ class ModuleControllerTest extends BaseControllerTest {
                 .body("menuItems", hasSize(1))
                 .body("menuItems[0].id", is(notNullValue()))
                 .body("menuItems[0].label", is(menuItem.getLabel()))
+                .body("menuItems[0].description", is(menuItem.getDescription()))
                 .body("menuItems[0].route", is(menuItem.getRoute()))
                 .body("menuItems[0].icon", is(menuItem.getIcon()))
                 .body("menuItems[0].position", is(menuItem.getPosition()))

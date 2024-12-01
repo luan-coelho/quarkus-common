@@ -1,12 +1,14 @@
 package com.luan.common.model.module;
 
 import com.luan.common.model.user.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import com.luan.common.service.module.MenuItemService;
+import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,11 +19,12 @@ import lombok.Setter;
 public class MenuItem extends BaseEntity {
 
     private String label;
+    private String description;
     private String route;
     private String icon;
     private Integer position;
 
-    @ManyToOne
-    private MenuItem parent;
+    @ManyToMany
+    private List<MenuItem> subItems;
 
 }

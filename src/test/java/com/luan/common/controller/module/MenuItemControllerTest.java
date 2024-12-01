@@ -16,6 +16,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
@@ -47,12 +49,13 @@ class MenuItemControllerTest extends BaseControllerTest {
                 .header("Content-Type", MediaType.APPLICATION_JSON)
                 .body(json)
                 .when()
-                .post(getUrl())
+                .post("/menu-item")
                 .then()
                 .log().all()
                 .statusCode(Response.Status.CREATED.getStatusCode())
                 .body("id", is(notNullValue()))
                 .body("label", is(menuItem.getLabel()))
+                .body("description", is(menuItem.getDescription()))
                 .body("route", is(menuItem.getRoute()))
                 .body("icon", is(menuItem.getIcon()))
                 .body("position", is(menuItem.getPosition()))
@@ -82,12 +85,13 @@ class MenuItemControllerTest extends BaseControllerTest {
                 .header("Content-Type", MediaType.APPLICATION_JSON)
                 .body(json)
                 .when()
-                .put(getUrl() + "/" + menuItem.getId())
+                .put("/menu-item/" + menuItem.getId())
                 .then()
                 .log().all()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .body("id", equalTo(menuItem.getId().toString()))
                 .body("label", is(menuItem.getLabel()))
+                .body("description", is(menuItem.getDescription()))
                 .body("route", is(menuItem.getRoute()))
                 .body("icon", is(menuItem.getIcon()))
                 .body("position", is(menuItem.getPosition()))
@@ -96,12 +100,13 @@ class MenuItemControllerTest extends BaseControllerTest {
 
     @TestTransaction
     @Test
-    public void whenCreateWithParent() {
-        MenuItem parent = createMenuItem("Configurações", "/settings", "fa fa-cogs");
-        saveMenuItemInOtherTransaction(parent);
+    public void whenCreateWithSubItem() {
+        MenuItem subItem = createMenuItem("Usuários", "/users", "fa fa-users");
+        saveMenuItemInOtherTransaction(subItem);
 
-        MenuItem menuItem = createMenuItem("Usuários", "/users", "fa fa-users");
-        menuItem.setParent(parent);
+        MenuItem menuItem = createMenuItem("Configurações", "/settings", "fa fa-cogs");
+        menuItem.setSubItems(new ArrayList<>());
+        menuItem.getSubItems().add(subItem);
 
         String json;
         try {
@@ -115,7 +120,7 @@ class MenuItemControllerTest extends BaseControllerTest {
                 .header("Content-Type", MediaType.APPLICATION_JSON)
                 .body(json)
                 .when()
-                .post(getUrl())
+                .post("/menu-item")
                 .then()
                 .log().all()
                 .statusCode(Response.Status.CREATED.getStatusCode())
@@ -125,56 +130,47 @@ class MenuItemControllerTest extends BaseControllerTest {
                 .body("icon", is(menuItem.getIcon()))
                 .body("position", is(menuItem.getPosition()))
                 .body("active", is(menuItem.isActive()))
-                .body("parent.id", equalTo(parent.getId().toString()))
-                .body("parent.label", is(parent.getLabel()))
-                .body("parent.route", is(parent.getRoute()))
-                .body("parent.icon", is(parent.getIcon()))
-                .body("parent.position", is(parent.getPosition()))
-                .body("parent.active", is(parent.isActive()));
+                .body("subItems", hasSize(1))
+                .body("subItems[0].id", is(subItem.getId().toString()))
+                .body("subItems[0].label", is(subItem.getLabel()))
+                .body("subItems[0].route", is(subItem.getRoute()))
+                .body("subItems[0].icon", is(subItem.getIcon()))
+                .body("subItems[0].position", is(subItem.getPosition()))
+                .body("subItems[0].active", is(subItem.isActive()));
     }
 
     @TestTransaction
     @Test
-    public void whenUpdateParent() {
-        MenuItem parent = createMenuItem("Configurações", "/settings", "fa fa-cogs");
-        saveMenuItemInOtherTransaction(parent);
-
-        MenuItem menuItem = createMenuItem("Usuários", "/users", "fa fa-users");
-        menuItem.setParent(parent);
+    public void whenAddSubItem() {
+        MenuItem menuItem = createMenuItem("Configurações", "/settings", "fa fa-cogs");
+        menuItem.setSubItems(new ArrayList<>());
         saveMenuItemInOtherTransaction(menuItem);
 
-        MenuItem newParent = createMenuItem("Gestão", "/management", "fa fa-cogs");
-        saveMenuItemInOtherTransaction(newParent);
-        menuItem.setParent(newParent);
-
-        String json;
-        try {
-            MenuItemResponseDto dto = mapper.toDto(menuItem);
-            json = JsonUtils.toJson(dto);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        MenuItem subItem = createMenuItem("Usuários", "/users", "fa fa-users");
+        saveMenuItemInOtherTransaction(subItem);
 
         given().contentType(ContentType.JSON)
                 .header("Content-Type", MediaType.APPLICATION_JSON)
-                .body(json)
                 .when()
-                .put(getUrl() + "/" + menuItem.getId())
+                .patch("/menu-item/" + menuItem.getId() + "/add-sub-item/" + subItem.getId())
                 .then()
                 .log().all()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .body("id", is(menuItem.getId().toString()))
                 .body("label", is(menuItem.getLabel()))
+                .body("description", is(menuItem.getDescription()))
                 .body("route", is(menuItem.getRoute()))
                 .body("icon", is(menuItem.getIcon()))
                 .body("position", is(menuItem.getPosition()))
                 .body("active", is(menuItem.isActive()))
-                .body("parent.id", equalTo(newParent.getId().toString()))
-                .body("parent.label", is(newParent.getLabel()))
-                .body("parent.route", is(newParent.getRoute()))
-                .body("parent.icon", is(newParent.getIcon()))
-                .body("parent.position", is(newParent.getPosition()))
-                .body("parent.active", is(newParent.isActive()));
+                .body("subItems", hasSize(1))
+                .body("subItems[0].id", is(subItem.getId().toString()))
+                .body("subItems[0].label", is(subItem.getLabel()))
+                .body("subItems[0].description", is(subItem.getDescription()))
+                .body("subItems[0].route", is(subItem.getRoute()))
+                .body("subItems[0].icon", is(subItem.getIcon()))
+                .body("subItems[0].position", is(subItem.getPosition()))
+                .body("subItems[0].active", is(subItem.isActive()));
     }
 
     @Test
@@ -185,7 +181,7 @@ class MenuItemControllerTest extends BaseControllerTest {
         given().contentType(ContentType.JSON)
                 .header("Content-Type", MediaType.APPLICATION_JSON)
                 .when()
-                .delete(getUrl() + "/" + menuItem.getId())
+                .delete("/menu-item/" + menuItem.getId())
                 .then()
                 .log().all()
                 .statusCode(Response.Status.NO_CONTENT.getStatusCode());
@@ -193,17 +189,19 @@ class MenuItemControllerTest extends BaseControllerTest {
 
     @Test
     public void whenDeleteAssociatedMenuItemThenConflict() {
-        MenuItem parent = createMenuItem("Configurações", "/settings", "fa fa-cogs");
-        menuItemService.save(parent);
+        MenuItem subItem = createMenuItem("Usuários", "/users", "fa fa-users");
+        saveMenuItemInOtherTransaction(subItem);
 
-        MenuItem menuItem = createMenuItem("Usuários", "/users", "fa fa-users");
-        menuItem.setParent(parent);
+        MenuItem menuItem = createMenuItem("Configurações", "/settings", "fa fa-cogs");
+        menuItem.setSubItems(new ArrayList<>());
+        menuItem.getSubItems().add(subItem);
+
         menuItemService.save(menuItem);
 
         given().contentType(ContentType.JSON)
                 .header("Content-Type", MediaType.APPLICATION_JSON)
                 .when()
-                .delete(getUrl() + "/" + parent.getId())
+                .delete("/menu-item/" + subItem.getId())
                 .then()
                 .log().all()
                 .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
@@ -213,6 +211,7 @@ class MenuItemControllerTest extends BaseControllerTest {
         MenuItem menuItem = new MenuItem();
         menuItem.setLabel(label);
         menuItem.setRoute(route);
+        menuItem.setDescription("Descrição do menu");
         menuItem.setIcon(icon);
         menuItem.setPosition(1);
         menuItem.setActive(true);

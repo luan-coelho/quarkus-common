@@ -18,9 +18,6 @@ public abstract class BaseController<T extends BaseEntity, DTO, UUID, S extends 
     @Inject
     S service;
 
-    @Inject
-    M mapper;
-
     @GET
     public Response getAll(Pageable pageable) {
         return Response.ok(service.findAllAndReturnDto(pageable)).build();

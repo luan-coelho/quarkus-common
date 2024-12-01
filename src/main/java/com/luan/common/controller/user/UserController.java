@@ -9,7 +9,7 @@ import jakarta.ws.rs.Path;
 
 import java.util.UUID;
 
-@Path("/api/users")
+@Path("/users")
 public class UserController extends BaseController<User, UserResponseDto, UUID, UserService, UserMapper> {
 
 }

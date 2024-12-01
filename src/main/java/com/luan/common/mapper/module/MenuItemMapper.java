@@ -13,7 +13,7 @@ public interface MenuItemMapper extends BaseMapper<MenuItem, MenuItemResponseDto
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "version", ignore = true)
-    @Mapping(target = "parent", expression = "java(source.getParent())")
+    @Mapping(target = "subItems", expression = "java(source.getSubItems())")
     @Mapping(target = "id", ignore = true)
     @Override
     void copyProperties(MenuItem source, @MappingTarget MenuItem target);

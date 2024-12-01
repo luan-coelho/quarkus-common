@@ -1,6 +1,7 @@
 package com.luan.common.dto.module;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -9,10 +10,11 @@ import java.util.UUID;
 public record MenuItemResponseDto(
         UUID id,
         String label,
+        String description,
         String route,
         String icon,
         Integer position,
-        MenuItemResponseDto parent,
+        List<MenuItemResponseDto> subItems,
         boolean active) implements Serializable {
 
 }

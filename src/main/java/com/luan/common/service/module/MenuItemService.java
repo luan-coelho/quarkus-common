@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -22,7 +23,7 @@ public class MenuItemService extends BaseService<MenuItem, MenuItemResponseDto, 
 
     @Transactional
     public MenuItem save(MenuItem entity) {
-        validateParent(entity);
+        validateSubItems(entity);
         return super.save(entity);
     }
 
@@ -30,21 +31,42 @@ public class MenuItemService extends BaseService<MenuItem, MenuItemResponseDto, 
     public MenuItem updateById(UUID id, MenuItem entity) {
         MenuItem menuItem = getRepository()
                 .findByIdOptional(id)
-                .orElseThrow(() -> new NotFoundException("Menu não encontrado"));
-        validateParent(entity);
+                .orElseThrow(() -> new NotFoundException("Item de menu não encontrado"));
+        validateSubItems(entity);
         getMapper().copyProperties(entity, menuItem);
         return update(menuItem);
     }
 
     @Transactional
-    public void validateParent(MenuItem entity) {
-        if (entity.getParent() != null && entity.getParent().getId() != null) {
-            MenuItem parent = getRepository()
-                    .findByIdOptional(entity.getParent().getId())
-                    .orElseThrow(() -> new NotFoundException("Menu pai não encontrado"));
-            entity.setParent(parent);
-        } else {
-            entity.setParent(null);
+    public MenuItemResponseDto addSubItem(UUID id, UUID subItemId) {
+        MenuItem menuItem = getRepository()
+                .findByIdOptional(id)
+                .orElseThrow(() -> new NotFoundException("Item de menu não encontrado"));
+        MenuItem subItem = getRepository().findByIdOptional(subItemId)
+                .orElseThrow(() -> new NotFoundException("Item filho não encontrado"));
+        menuItem.getSubItems().add(subItem);
+        MenuItem updated = update(menuItem);
+        return getMapper().toDto(updated);
+    }
+
+    @Transactional
+    public void validateSubItems(MenuItem entity) {
+        List<MenuItem> subItems = entity.getSubItems();
+
+        if (subItems == null) {
+            return;
+        }
+
+        for (int i = 0; i < subItems.size(); i++) {
+            MenuItem subItem = subItems.get(i);
+            if (subItem.getId() != null) {
+                MenuItem submenu = getRepository()
+                        .findByIdOptional(subItem.getId())
+                        .orElseThrow(() -> new NotFoundException("Item filho não encontrado"));
+                subItems.set(i, submenu);
+            } else {
+                subItems.set(i, null);
+            }
         }
     }
 
