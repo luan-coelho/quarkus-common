@@ -10,6 +10,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
@@ -21,6 +22,13 @@ class PanacheFilterUtilsTest {
 
     @Inject
     MenuItemService menuItemService;
+
+    @TestTransaction
+    @AfterEach
+    public void cleanup() {
+        menuItemService.getRepository().deleteAll();
+        menuItemService.getRepository().flush();
+    }
 
     @TestTransaction
     @Test
@@ -112,7 +120,7 @@ class PanacheFilterUtilsTest {
         MenuItem menuItem2 = createMenuItem("Configurações", "/settings", "fa fa-cogs");
         saveMenuItemInOtherTransaction(menuItem2);
 
-        String filter = "?filters=label:eq:Usuários&sort=label:asc";
+        String filter = "?filters=label:eq:Usuários";
 
         given().contentType(ContentType.JSON)
                 .header("Content-Type", MediaType.APPLICATION_JSON)

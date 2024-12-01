@@ -44,6 +44,7 @@ java {
 
 test {
     systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+    jvmArgs '-Dquarkus.profile=test'
 }
 
 compileJava {
@@ -57,4 +58,23 @@ compileTestJava {
 
 tasks.withType(GenerateModuleMetadata).configureEach {
     suppressedValidationErrors.add('enforced-platform')
+}
+
+allprojects {
+    tasks.withType(Test).configureEach {
+        systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+        jvmArgs "-Dquarkus.application.version=${quarkusPlatformVersion}",
+                '-Duser.timezone=America/Sao_Paulo',
+                '-Duser.language=pt',
+                '-Duser.country=BR',
+                '-Dfile.encoding=UTF-8'
+    }
+}
+
+tasks.withType(JavaExec).configureEach {
+    jvmArgs "-Dquarkus.application.version=${quarkusPlatformVersion}",
+            '-Duser.timezone=America/Sao_Paulo',
+            '-Duser.language=pt',
+            '-Duser.country=BR',
+            '-Dfile.encoding=UTF-8'
 }
