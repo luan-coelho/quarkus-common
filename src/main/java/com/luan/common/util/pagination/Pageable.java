@@ -14,5 +14,7 @@ public final class Pageable {
     private int size = Pagination.STANDARD_PAGE_SIZE;
     @QueryParam("sort")
     private String sort;
+    @QueryParam("filters")
+    String filters;
 
 }

@@ -1,4 +1,4 @@
-package com.luan.common.controller.module;
+package integration.com.luan.common.controller;
 
 
 import io.restassured.http.ContentType;
@@ -24,6 +24,6 @@ public abstract class BaseControllerTest {
                 .body("pagination", not(nullValue()));
     }
 
-    abstract String getUrl();
+    protected abstract String getUrl();
 
 }

@@ -133,6 +133,12 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
 
     @Transactional
     @Override
+    public void deleteAll() {
+        this.repository.deleteAll();
+    }
+
+    @Transactional
+    @Override
     public List<Revision<T>> findAllRevisions(UUID entityId) {
         AuditReader reader = AuditReaderFactory.get(getRepository().getEntityManager());
         List<Number> revisionsNumbers = reader.getRevisions(entityType, entityId);

@@ -28,6 +28,7 @@ dependencies {
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
     testImplementation 'io.quarkus:quarkus-junit5'
+    testImplementation 'io.quarkus:quarkus-junit5-mockito'
     testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     testImplementation 'io.rest-assured:rest-assured'
 }

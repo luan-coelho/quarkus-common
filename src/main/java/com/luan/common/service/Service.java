@@ -32,6 +32,8 @@ public interface Service<T, DTO, UUID> {
 
     void deleteById(UUID id);
 
+    void deleteAll();
+
     boolean existsById(UUID id);
 
     List<Revision<T>> findAllRevisions(UUID id);

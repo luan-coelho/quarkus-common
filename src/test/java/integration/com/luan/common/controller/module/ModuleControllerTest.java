@@ -1,4 +1,4 @@
-package com.luan.common.controller.module;
+package integration.com.luan.common.controller.module;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.luan.common.dto.module.ModuleResponseDto;
@@ -11,6 +11,7 @@ import com.luan.common.service.module.MenuItemService;
 import com.luan.common.service.module.ModuleService;
 import com.luan.common.service.user.UserService;
 import com.luan.common.util.JsonUtils;
+import integration.com.luan.common.controller.BaseControllerTest;
 import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
@@ -252,7 +253,7 @@ class ModuleControllerTest extends BaseControllerTest {
     }
 
     @Override
-    String getUrl() {
+    public String getUrl() {
         return "/module";
     }
 

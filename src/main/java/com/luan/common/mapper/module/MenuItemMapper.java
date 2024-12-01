@@ -5,6 +5,7 @@ import com.luan.common.dto.module.MenuItemResponseDto;
 import com.luan.common.mapper.BaseMapper;
 import com.luan.common.mapper.QuarkusMappingConfig;
 import com.luan.common.model.module.MenuItem;
+import jakarta.transaction.Transactional;
 import org.mapstruct.*;
 
 @Mapper(config = QuarkusMappingConfig.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
@@ -20,6 +21,7 @@ public interface MenuItemMapper extends BaseMapper<MenuItem, MenuItemResponseDto
 
     MenuItem toEntity(MenuItemResponseDto dto);
 
+    @Transactional
     @Override
     MenuItemResponseDto toDto(MenuItem target);
 

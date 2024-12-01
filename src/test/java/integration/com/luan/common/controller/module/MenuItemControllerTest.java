@@ -1,5 +1,5 @@
 
-package com.luan.common.controller.module;
+package integration.com.luan.common.controller.module;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.luan.common.dto.module.MenuItemResponseDto;
@@ -7,6 +7,7 @@ import com.luan.common.mapper.module.MenuItemMapper;
 import com.luan.common.model.module.MenuItem;
 import com.luan.common.service.module.MenuItemService;
 import com.luan.common.util.JsonUtils;
+import integration.com.luan.common.controller.BaseControllerTest;
 import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
@@ -227,11 +228,10 @@ class MenuItemControllerTest extends BaseControllerTest {
     public void saveMenuItemInOtherTransaction(MenuItem menuItem) {
         menuItemService.save(menuItem);
         menuItemService.getRepository().flush();
-//        menuItemService.getRepository().getEntityManager().clear();
     }
 
     @Override
-    String getUrl() {
+    public String getUrl() {
         return "/menu-item";
     }
 
