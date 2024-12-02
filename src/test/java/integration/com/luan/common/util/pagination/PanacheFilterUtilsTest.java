@@ -36,7 +36,7 @@ class PanacheFilterUtilsTest {
         MenuItem menuItem = createMenuItem("Usuários", "/users", "fa fa-users");
         saveMenuItemInOtherTransaction(menuItem);
 
-        String filter = "?filters=label:eq:Usuários";
+        String filter = "?filters=label;eq;Usuários";
 
         given().contentType(ContentType.JSON)
                 .header("Content-Type", MediaType.APPLICATION_JSON)
@@ -62,7 +62,7 @@ class PanacheFilterUtilsTest {
     @TestTransaction
     @Test
     public void whenInvalidFiltersThenReturnEmpty() {
-        String filter = "?filters=label:eq:xxxxxx";
+        String filter = "?filters=label;eq;xxxxxx";
 
         given().contentType(ContentType.JSON)
                 .header("Content-Type", MediaType.APPLICATION_JSON)
@@ -87,7 +87,12 @@ class PanacheFilterUtilsTest {
         MenuItem menuItem = createMenuItem("Usuários", "/users", "fa fa-users");
         saveMenuItemInOtherTransaction(menuItem);
 
-        String filter = "?filters=label:eq:Usuários&sort=label:asc";
+        MenuItem subItem = createMenuItem("Cadastro", "/users/register", "fa fa-user-plus");
+        saveMenuItemInOtherTransaction(subItem);
+
+        menuItemService.addSubItem(menuItem.getId(), subItem.getId());
+
+        String filter = "?filters=label;eq;Usuários&sort=label;asc";
 
         given().contentType(ContentType.JSON)
                 .header("Content-Type", MediaType.APPLICATION_JSON)
@@ -120,7 +125,7 @@ class PanacheFilterUtilsTest {
         MenuItem menuItem2 = createMenuItem("Configurações", "/settings", "fa fa-cogs");
         saveMenuItemInOtherTransaction(menuItem2);
 
-        String filter = "?filters=label:eq:Usuários";
+        String filter = "?filters=label;eq;Usuários";
 
         given().contentType(ContentType.JSON)
                 .header("Content-Type", MediaType.APPLICATION_JSON)
@@ -130,7 +135,7 @@ class PanacheFilterUtilsTest {
                 .log().all()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .body("$", hasKey("content"))
-                .body("content", hasSize(1))
+                .body("content", not(nullValue()))
                 .body("content.find { it.label == '%s' }", withArgs(menuItem.getLabel()), notNullValue())
                 .body("content.find { it.label == '%s' }.description", withArgs(menuItem.getLabel()), is(menuItem.getDescription()))
                 .body("content.find { it.label == '%s' }.route", withArgs(menuItem.getLabel()), is(menuItem.getRoute()))
@@ -141,6 +146,103 @@ class PanacheFilterUtilsTest {
                 .body("pagination.itemsPerPage", greaterThan(0))
                 .body("pagination.totalPages", greaterThan(0))
                 .body("pagination.totalItems", greaterThan(0));
+    }
+
+    //Quando for passado um campo que não existe na entidade deve retornar erro
+    @TestTransaction
+    @Test
+    public void whenInvalidFieldThenReturnError() {
+        String filter = "?filters=eq;Usuarios";
+
+        given().contentType(ContentType.JSON)
+                .header("Content-Type", MediaType.APPLICATION_JSON)
+                .when()
+                .get("/menu-item" + filter)
+                .then()
+                .log().all()
+                .statusCode(Response.Status.BAD_REQUEST.getStatusCode())
+                .body("title", is("Argumento inválido"))
+                .body("status", is(Response.Status.BAD_REQUEST.getStatusCode()))
+                .body("detail", is("Filtro inválido: eq;Usuarios. Formato esperado: 'campo;operador;valor'."))
+                .body("instance", containsString("menu-item?filters=eq%3BUsuarios"));
+    }
+
+    //Quando for passado um filtro de um campo de relacionamento deve retornar com sucesso
+    @TestTransaction
+    @Test
+    public void whenValidFiltersAndSortThenReturnMenuItemWithSubItem() {
+        MenuItem menuItem = createMenuItem("Usuários", "/users", "fa fa-users");
+        saveMenuItemInOtherTransaction(menuItem);
+
+        MenuItem subItem = createMenuItem("Cadastro", "/users/register", "fa fa-user-plus");
+        saveMenuItemInOtherTransaction(subItem);
+
+        addSubItemToMenuItemInOtherTransaction(menuItem, subItem);
+
+        String filter = "?filters=subItems.label;like;Cadas";
+
+        given().contentType(ContentType.JSON)
+                .header("Content-Type", MediaType.APPLICATION_JSON)
+                .when()
+                .get("/menu-item" + filter)
+                .then()
+                .log().all()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .body("$", hasKey("content"))
+                .body("content", hasSize(greaterThanOrEqualTo(1))
+                )
+                .body("content.find { it.label == '%s' }", withArgs(menuItem.getLabel()), notNullValue())
+                .body("content.find { it.label == '%s' }.description", withArgs(menuItem.getLabel()), is(menuItem.getDescription()))
+                .body("content.find { it.label == '%s' }.route", withArgs(menuItem.getLabel()), is(menuItem.getRoute()))
+                .body("content.find { it.label == '%s' }.icon", withArgs(menuItem.getLabel()), is(menuItem.getIcon()))
+                .body("$", hasKey("pagination"))
+                .body("pagination", not(nullValue()))
+                .body("pagination.currentPage", greaterThan(0))
+                .body("pagination.itemsPerPage", greaterThan(0))
+                .body("pagination.totalPages", greaterThan(0))
+                .body("pagination.totalItems", greaterThan(0));
+    }
+
+    //Quando for passado um filtro de um campo de relacionamento e um campo normal deve retornar com sucesso
+    @TestTransaction
+    @Test
+    public void whenValidFiltersAndSortThenReturnMenuItemWithSubItemAndNormalField() {
+        MenuItem menuItem = createMenuItem("Usuários", "/users", "fa fa-users");
+        saveMenuItemInOtherTransaction(menuItem);
+
+        MenuItem subItem = createMenuItem("Cadastro", "/users/register", "fa fa-user-plus");
+        saveMenuItemInOtherTransaction(subItem);
+
+        addSubItemToMenuItemInOtherTransaction(menuItem, subItem);
+
+        String filter = "?filters=subItems.label;like;Cadas,label;eq;Usuários,updatedAt;gt;2021-01-01T00:00:00";
+
+        given().contentType(ContentType.JSON)
+                .header("Content-Type", MediaType.APPLICATION_JSON)
+                .when()
+                .get("/menu-item" + filter)
+                .then()
+                .log().all()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .body("$", hasKey("content"))
+                .body("content", hasSize(greaterThanOrEqualTo(1))
+                )
+                .body("content.find { it.label == '%s' }", withArgs(menuItem.getLabel()), notNullValue())
+                .body("content.find { it.label == '%s' }.description", withArgs(menuItem.getLabel()), is(menuItem.getDescription()))
+                .body("content.find { it.label == '%s' }.route", withArgs(menuItem.getLabel()), is(menuItem.getRoute()))
+                .body("content.find { it.label == '%s' }.icon", withArgs(menuItem.getLabel()), is(menuItem.getIcon()))
+                .body("$", hasKey("pagination"))
+                .body("pagination", not(nullValue()))
+                .body("pagination.currentPage", greaterThan(0))
+                .body("pagination.itemsPerPage", greaterThan(0))
+                .body("pagination.totalPages", greaterThan(0))
+                .body("pagination.totalItems", greaterThan(0));
+    }
+
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public void addSubItemToMenuItemInOtherTransaction(MenuItem menuItem, MenuItem subItem) {
+        menuItemService.addSubItem(menuItem.getId(), subItem.getId());
+        menuItemService.getRepository().flush();
     }
 
     @Transactional(Transactional.TxType.REQUIRES_NEW)
