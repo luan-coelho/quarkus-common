@@ -46,8 +46,7 @@ class ModuleControllerTest extends BaseControllerTest {
 
     @Test
     public void whenCreateModule() {
-        Module module = new Module();
-        module.setName("Gestão de Usuários");
+        Module module = createModule();
         module.setMenuItems(new ArrayList<>());
         module.setUsers(new ArrayList<>());
         module.setActive(true);
@@ -77,8 +76,7 @@ class ModuleControllerTest extends BaseControllerTest {
 
     @Test
     public void whenAddUserToModule() {
-        Module module = new Module();
-        module.setName("Gestão de Usuários");
+        Module module = createModule();
         module.setMenuItems(new ArrayList<>());
         module.setUsers(new ArrayList<>());
         module.setActive(true);
@@ -107,8 +105,7 @@ class ModuleControllerTest extends BaseControllerTest {
     @TestTransaction
     @Test
     public void whenAddLinkedUserToModule() {
-        Module module = new Module();
-        module.setName("Gestão de Usuários");
+        Module module = createModule();
         module.setMenuItems(new ArrayList<>());
         module.setUsers(new ArrayList<>());
         module.setActive(true);
@@ -133,8 +130,7 @@ class ModuleControllerTest extends BaseControllerTest {
 
     @Test
     public void whenAddMenuItemToModule() {
-        Module module = new Module();
-        module.setName("Gestão de Usuários");
+        Module module = createModule();
         module.setMenuItems(new ArrayList<>());
         module.setUsers(new ArrayList<>());
         module.setActive(true);
@@ -171,8 +167,7 @@ class ModuleControllerTest extends BaseControllerTest {
 
     @Test
     public void whenAddLinkedMenuItemToModule() {
-        Module module = new Module();
-        module.setName("Gestão de Usuários");
+        Module module = createModule();
         module.setMenuItems(new ArrayList<>());
         module.setUsers(new ArrayList<>());
         module.setActive(true);
@@ -198,6 +193,46 @@ class ModuleControllerTest extends BaseControllerTest {
                 .body("status", is(Response.Status.BAD_REQUEST.getStatusCode()))
                 .body("detail", is("Item de menu já vinculado ao módulo"))
                 .body("instance", containsString("/module/" + module.getId() + "/add-menu-item/" + menuItem.getId()));
+    }
+
+    @Test
+    public void whenActivateModule() {
+        Module module = createModule();
+        module.setActive(false);
+        saveInAnotherTransaction(module);
+
+        given().contentType(ContentType.JSON)
+                .header("Content-Type", MediaType.APPLICATION_JSON)
+                .when()
+                .patch("/module/{id}/activate", module.getId())
+                .then()
+                .log().all()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .body("id", is(notNullValue()))
+                .body("name", is(module.getName()))
+                .body("menuItems", hasSize(0))
+                .body("users", hasSize(0))
+                .body("active", is(true));
+    }
+
+    @Test
+    public void whenDisableModule() {
+        Module module = createModule();
+        module.setActive(true);
+        saveInAnotherTransaction(module);
+
+        given().contentType(ContentType.JSON)
+                .header("Content-Type", MediaType.APPLICATION_JSON)
+                .when()
+                .patch("/module/{id}/disable", module.getId())
+                .then()
+                .log().all()
+                .statusCode(Response.Status.OK.getStatusCode())
+                .body("id", is(notNullValue()))
+                .body("name", is(module.getName()))
+                .body("menuItems", hasSize(0))
+                .body("users", hasSize(0))
+                .body("active", is(false));
     }
 
     @Transactional(Transactional.TxType.REQUIRES_NEW)
@@ -228,6 +263,12 @@ class ModuleControllerTest extends BaseControllerTest {
     protected void saveInAnotherTransaction(MenuItem menuItem) {
         menuItemService.save(menuItem);
         menuItemService.getRepository().getEntityManager().flush();
+    }
+
+    private Module createModule() {
+        Module module = new Module();
+        module.setName("Gestão de Usuários");
+        return module;
     }
 
     private User createUser() {

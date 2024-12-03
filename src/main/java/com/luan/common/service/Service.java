@@ -34,6 +34,14 @@ public interface Service<T, DTO, UUID> {
 
     void deleteAll();
 
+    T activateById(UUID id);
+
+    DTO activateByIdAndReturnDto(UUID id);
+
+    T disableById(UUID id);
+
+    DTO disableByIdAndReturnDto(UUID id);
+
     boolean existsById(UUID id);
 
     List<Revision<T>> findAllRevisions(UUID id);

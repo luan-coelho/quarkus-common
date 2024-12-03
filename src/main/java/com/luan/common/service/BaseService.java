@@ -122,6 +122,34 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
         }
     }
 
+    @Transactional
+    @Override
+    public T activateById(UUID uuid) {
+        T entity = findById(uuid);
+        entity.setActive(true);
+        return update(entity);
+    }
+
+    @Transactional
+    @Override
+    public DTO activateByIdAndReturnDto(UUID uuid) {
+        return this.mapper.toDto(activateById(uuid));
+    }
+
+    @Transactional
+    @Override
+    public T disableById(UUID uuid) {
+        T entity = findById(uuid);
+        entity.setActive(false);
+        return update(entity);
+    }
+
+    @Transactional
+    @Override
+    public DTO disableByIdAndReturnDto(UUID uuid) {
+        return this.mapper.toDto(disableById(uuid));
+    }
+
     @Override
     public boolean existsById(UUID id) {
         return this.repository.existsById(id);

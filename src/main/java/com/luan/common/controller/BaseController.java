@@ -47,6 +47,18 @@ public abstract class BaseController<T extends BaseEntity, DTO, UUID, S extends 
         return Response.noContent().build();
     }
 
+    @Path("/{id}/activate")
+    @PATCH
+    public Response activateById(@PathParam("id") UUID id) {
+        return Response.ok(service.activateByIdAndReturnDto(id)).build();
+    }
+
+    @Path("/{id}/disable")
+    @PATCH
+    public Response disableById(@PathParam("id") UUID id) {
+        return Response.ok(service.disableByIdAndReturnDto(id)).build();
+    }
+
     @Path("/{id}/revisions")
     @GET
     public Response findAllRevisions(@PathParam("id") UUID id) {
