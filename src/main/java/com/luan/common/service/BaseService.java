@@ -115,8 +115,8 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
     public void deleteById(UUID uuid) {
         T entity = this.repository.findByIdOptional(uuid).orElseThrow(() -> new NotFoundException("Entity not found"));
         try {
-            getRepository().getEntityManager().remove(entity);
-            getRepository().getEntityManager().flush();
+            repository.getEntityManager().remove(entity);
+            repository.getEntityManager().flush();
         } catch (ConstraintViolationException e) {
             throw new IllegalStateException("Não é possível excluir o item, pois ele está sendo referenciado.");
         }
@@ -125,9 +125,12 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
     @Transactional
     @Override
     public T activateById(UUID uuid) {
-        T entity = findById(uuid);
-        entity.setActive(true);
-        return update(entity);
+        boolean exists = existsById(uuid);
+        if (!exists) {
+            throw new NotFoundException("Entidade não encontrada");
+        }
+        repository.activeById(uuid);
+        return findById(uuid);
     }
 
     @Transactional
@@ -139,9 +142,12 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
     @Transactional
     @Override
     public T disableById(UUID uuid) {
-        T entity = findById(uuid);
-        entity.setActive(false);
-        return update(entity);
+        boolean exists = existsById(uuid);
+        if (!exists) {
+            throw new NotFoundException("Entidade não encontrada");
+        }
+        repository.desactiveById(uuid);
+        return findById(uuid);
     }
 
     @Transactional
@@ -168,7 +174,7 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
     @Transactional
     @Override
     public List<Revision<T>> findAllRevisions(UUID entityId) {
-        AuditReader reader = AuditReaderFactory.get(getRepository().getEntityManager());
+        AuditReader reader = AuditReaderFactory.get(repository.getEntityManager());
         List<Number> revisionsNumbers = reader.getRevisions(entityType, entityId);
         List<Revision<T>> revisionList = new ArrayList<>();
         for (Number revisionNumber : revisionsNumbers) {
@@ -185,7 +191,7 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
     private RevisionComparator<T> buildComparator(UUID entityId, Integer revisionId) {
         RevisionComparator<T> comparator = new RevisionComparator<>();
 
-        AuditReader auditReader = AuditReaderFactory.get(getRepository().getEntityManager());
+        AuditReader auditReader = AuditReaderFactory.get(repository.getEntityManager());
         comparator.setAuditReader(auditReader);
 
         List<Number> revisions = auditReader.getRevisions(entityType, entityId);

@@ -10,11 +10,14 @@ public final class Pageable {
 
     @QueryParam("page")
     private int page = 1;
+
     @QueryParam("size")
     private int size = Pagination.STANDARD_PAGE_SIZE;
+
     @QueryParam("sort")
-    private String sort;
+    private String sort = "id:asc";
+
     @QueryParam("filters")
-    String filters;
+    private String filters;
 
 }

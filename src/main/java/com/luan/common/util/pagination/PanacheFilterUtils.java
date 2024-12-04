@@ -14,6 +14,26 @@ import java.util.StringJoiner;
  */
 public class PanacheFilterUtils {
 
+    public static <T> QueryAndParameters buildQueryFromFiltersAndSort(
+            String filterQueryParams,
+            String sort,
+            Class<T> entityClass) {
+
+        // Constrói os filtros
+        QueryAndParameters queryAndParameters = buildQueryFromFilters(filterQueryParams, entityClass);
+
+        // Constrói a cláusula ORDER BY
+        String orderByClause = buildOrderByClause(sort);
+
+        // Combina filtros e ordenação
+        String finalQuery = queryAndParameters.query();
+        if (!orderByClause.isEmpty()) {
+            finalQuery += " order by " + orderByClause;
+        }
+
+        return new QueryAndParameters(finalQuery.trim(), queryAndParameters.parameters());
+    }
+
     /**
      * Processa os filtros recebidos e constrói a consulta dinâmica.
      *
@@ -28,7 +48,7 @@ public class PanacheFilterUtils {
             return new QueryAndParameters("", new Parameters());
         }
 
-        StringJoiner query = new StringJoiner(" AND ");
+        StringJoiner query = new StringJoiner(" and ");
         Parameters params = new Parameters();
         String[] filters = filterQueryParams.split(",");
 
@@ -53,7 +73,7 @@ public class PanacheFilterUtils {
                     params.and(paramName, convertedValue);
                     break;
                 case "like":
-                    query.add(adjustedFieldPath + " LIKE :" + paramName);
+                    query.add(adjustedFieldPath + " like :" + paramName);
                     params.and(paramName, "%" + convertedValue + "%");
                     break;
                 case "gt":
@@ -72,6 +92,36 @@ public class PanacheFilterUtils {
         return new QueryAndParameters(query.toString(), params);
     }
 
+    public static String buildOrderByClause(String sort) {
+        String orderBy = "id asc";
+        if (sort == null || sort.trim().isEmpty()) {
+            return orderBy; // Ordenação padrão
+        }
+
+        String[] sortFields = sort.split(",");
+        StringJoiner orderByClause = new StringJoiner(", ");
+
+        for (String sortField : sortFields) {
+            String[] parts = sortField.split(":");
+            if (parts.length != 2) {
+                String msg = "Parâmetro de ordenação inválido: " + sortField + ". Formato esperado: 'campo:asc|desc'.";
+                throw new IllegalArgumentException(msg);
+            }
+
+            String fieldName = parts[0].trim();
+            String direction = parts[1].trim().toLowerCase();
+
+            // Adiciona o campo e a direção ao ORDER BY
+            if (!direction.equalsIgnoreCase("asc") && !direction.equalsIgnoreCase("desc")) {
+                return orderBy; // Ordenação padrão
+            }
+
+            orderByClause.add(fieldName + " " + direction.toLowerCase());
+        }
+
+        return orderByClause.toString();
+    }
+
     /**
      * Ajusta o caminho do campo para incluir `ELEMENTS()` se necessário.
      */
@@ -86,7 +136,7 @@ public class PanacheFilterUtils {
 
             // Adiciona `ELEMENTS()` se o campo for uma coleção
             if (isCollectionField(field)) {
-                adjustedPath.append("ELEMENTS(").append(part).append(")");
+                adjustedPath.append("elements(").append(part).append(")");
             } else {
                 adjustedPath.append(part);
             }

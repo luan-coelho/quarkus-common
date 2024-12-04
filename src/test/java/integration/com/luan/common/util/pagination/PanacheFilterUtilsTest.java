@@ -83,16 +83,14 @@ class PanacheFilterUtilsTest {
 
     @TestTransaction
     @Test
-    public void whenValidFiltersAndSortThenReturnMenuItem() {
-        MenuItem menuItem = createMenuItem("Usuários", "/users", "fa fa-users");
-        saveMenuItemInOtherTransaction(menuItem);
+    public void whenValidFiltersAndSortAscThenReturnMenuItem() {
+        MenuItem menuItem1 = createMenuItem("A", "/users", "fa fa-users");
+        saveMenuItemInOtherTransaction(menuItem1);
 
-        MenuItem subItem = createMenuItem("Cadastro", "/users/register", "fa fa-user-plus");
-        saveMenuItemInOtherTransaction(subItem);
+        MenuItem menuItem2 = createMenuItem("B", "/users", "fa fa-users");
+        saveMenuItemInOtherTransaction(menuItem2);
 
-        menuItemService.addSubItem(menuItem.getId(), subItem.getId());
-
-        String filter = "?filters=label;eq;Usuários&sort=label;asc";
+        String filter = "?filters=label;eq;Usuários&sort=label:asc";
 
         given().contentType(ContentType.JSON)
                 .header("Content-Type", MediaType.APPLICATION_JSON)
@@ -103,10 +101,11 @@ class PanacheFilterUtilsTest {
                 .statusCode(Response.Status.OK.getStatusCode())
                 .body("$", hasKey("content"))
                 .body("content", hasSize(greaterThanOrEqualTo(1)))
-                .body("content.find { it.label == '%s' }", withArgs(menuItem.getLabel()), notNullValue())
-                .body("content.find { it.label == '%s' }.description", withArgs(menuItem.getLabel()), is(menuItem.getDescription()))
-                .body("content.find { it.label == '%s' }.route", withArgs(menuItem.getLabel()), is(menuItem.getRoute()))
-                .body("content.find { it.label == '%s' }.icon", withArgs(menuItem.getLabel()), is(menuItem.getIcon()))
+                .body("content.find { it.label == '%s' }", withArgs(menuItem1.getLabel()), notNullValue())
+                .body("content.find { it.label == '%s' }.description", withArgs(menuItem1.getLabel()), is(menuItem1.getDescription()))
+                .body("content.find { it.label == '%s' }.route", withArgs(menuItem1.getLabel()), is(menuItem1.getRoute()))
+                .body("content.find { it.label == '%s' }.icon", withArgs(menuItem1.getLabel()), is(menuItem1.getIcon()))
+                .body("content.find { it.label == '%s' }.subItems", withArgs(menuItem1.getLabel()), notNullValue())
                 .body("$", hasKey("pagination"))
                 .body("pagination", not(nullValue()))
                 .body("pagination.currentPage", greaterThan(0))

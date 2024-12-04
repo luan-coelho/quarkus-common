@@ -11,7 +11,7 @@ import java.util.List;
 public class Repository<T, UUID> implements PanacheRepositoryBase<T, UUID> {
 
     public DataPagination<T> listAll(Pageable pageable) {
-        QueryAndParameters qp = PanacheFilterUtils.buildQueryFromFilters(pageable.getFilters(), getEntityClass());
+        QueryAndParameters qp = PanacheFilterUtils.buildQueryFromFiltersAndSort(pageable.getFilters(), pageable.getSort(), getEntityClass());
         PanacheQuery<T> panacheQuery = !qp.query().isEmpty()
                 ? find(qp.query(), qp.parameters())
                 : findAll();
@@ -20,6 +20,14 @@ public class Repository<T, UUID> implements PanacheRepositoryBase<T, UUID> {
 
     public boolean existsById(UUID id) {
         return count("id", id) > 0;
+    }
+
+    public void desactiveById(UUID id) {
+        update("active = false where id = ?1", id);
+    }
+
+    public void activeById(UUID id) {
+        update("active = true where id = ?1", id);
     }
 
     public DataPagination<T> buildDataPagination(Pageable pageable, PanacheQuery<T> panacheQuery) {
