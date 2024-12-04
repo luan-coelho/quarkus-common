@@ -11,3 +11,9 @@ VALUES (true, 1, 1, NOW(), NOW(), '223e4567-e89b-12d3-a456-426614174001', 'puzzl
 -- Relacionar módulo com os itens de menu
 INSERT INTO module_menu_item (module_id, menuitems_id)
 VALUES ('123e4567-e89b-12d3-a456-426614174000', '223e4567-e89b-12d3-a456-426614174001');
+
+INSERT INTO "user" (active, version, createdat, updatedat, id, email, name, password)
+VALUES (true, 1, NOW(), NOW(), '123e4567-e89b-12d3-a456-426614174001', 'user@gmail.com', 'User', '123');
+
+INSERT INTO user_module (user_id, module_id)
+VALUES ('123e4567-e89b-12d3-a456-426614174001', '123e4567-e89b-12d3-a456-426614174000');

@@ -31,16 +31,18 @@ public class Repository<T, UUID> implements PanacheRepositoryBase<T, UUID> {
     }
 
     public DataPagination<T> buildDataPagination(Pageable pageable, PanacheQuery<T> panacheQuery) {
-        Pagination pagination = buildPaginationFromPageable(pageable, panacheQuery);
         panacheQuery.page(Page.of(pageable.getPage() - 1, pageable.getSize()));
         List<T> list = panacheQuery.list();
+        Pagination pagination = buildPaginationFromPageable(pageable, panacheQuery);
+        pagination.setItemsOnPage(list.size());
         return new DataPagination<>(list, pagination);
     }
 
     private Pagination buildPaginationFromPageable(Pageable pageable, PanacheQuery<T> panacheQuery) {
         long totalItems = panacheQuery.count();
+        int itemsOnPage = pageable.getSize();
         long totalPages = (long) Math.ceil((double) totalItems / pageable.getSize());
-        return new Pagination(pageable.getPage(), totalPages, totalItems);
+        return new Pagination(pageable.getPage(), itemsOnPage, totalPages, totalItems);
     }
 
     @SuppressWarnings("unchecked")

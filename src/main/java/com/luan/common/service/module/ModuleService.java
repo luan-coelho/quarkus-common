@@ -66,4 +66,9 @@ public class ModuleService extends BaseService<Module, ModuleResponseDto, UUID, 
         return getMapper().toDto(module);
     }
 
+    public List<ModuleResponseDto> getModulesByUserId(UUID userId) {
+        List<Module> modules = getRepository().findByUserId(userId);
+        return getMapper().toDto(modules);
+    }
+
 }

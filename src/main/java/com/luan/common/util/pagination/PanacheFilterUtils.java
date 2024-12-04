@@ -1,6 +1,10 @@
 package com.luan.common.util.pagination;
 
 import io.quarkus.panache.common.Parameters;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.hibernate.envers.Audited;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -55,7 +59,7 @@ public class PanacheFilterUtils {
         for (int i = 0; i < filters.length; i++) {
             String[] parts = filters[i].split(";"); // Usando ponto e vírgula como delimitador
             String fieldPath = parts[0].trim();
-            String operator = parts[1].trim();
+            Operator operator = Operator.fromValue(parts[1].trim());
             String paramName = "param" + i;
             String value = parts[2].trim();
 
@@ -67,20 +71,24 @@ public class PanacheFilterUtils {
             Object convertedValue = convertValueToFieldType(field, value);
 
             // Constrói a consulta com base no operador
-            switch (operator.toLowerCase()) {
-                case "eq":
+            switch (operator) {
+                case Operator.EQUALS:
                     query.add(adjustedFieldPath + " = :" + paramName);
                     params.and(paramName, convertedValue);
                     break;
-                case "like":
+                case Operator.LIKE:
                     query.add(adjustedFieldPath + " like :" + paramName);
                     params.and(paramName, "%" + convertedValue + "%");
                     break;
-                case "gt":
+                case Operator.ILIKE:
+                    query.add("lower(" + adjustedFieldPath + ") like lower(:" + paramName + ")");
+                    params.and(paramName, "%" + convertedValue + "%");
+                    break;
+                case Operator.GREATER_THAN:
                     query.add(adjustedFieldPath + " > :" + paramName);
                     params.and(paramName, convertedValue);
                     break;
-                case "lt":
+                case Operator.LESS_THAN:
                     query.add(adjustedFieldPath + " < :" + paramName);
                     params.and(paramName, convertedValue);
                     break;
@@ -262,5 +270,27 @@ public class PanacheFilterUtils {
                 "Não foi possível determinar o tipo dos elementos da coleção para o campo: " + field.getName());
     }
 
+    @Getter
+    @RequiredArgsConstructor
+    public enum Operator {
+
+        EQUALS("eq"),
+        LIKE("like"),
+        ILIKE("ilike"),
+        GREATER_THAN("gt"),
+        LESS_THAN("lt");
+
+        private final String value;
+
+        public static Operator fromValue(String value) {
+            for (Operator operator : Operator.values()) {
+                if (operator.getValue().equals(value)) {
+                    return operator;
+                }
+            }
+            throw new IllegalArgumentException("Invalid operator value: " + value);
+        }
+
+    }
 
 }
