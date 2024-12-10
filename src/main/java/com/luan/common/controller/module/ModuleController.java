@@ -12,7 +12,7 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.UUID;
 
-@Path("/module")
+@Path("/modules")
 public class ModuleController extends BaseController<Module, ModuleResponseDto, UUID, ModuleService, ModuleMapper> {
 
     @Path("/{id}/add-user/{userId}")
