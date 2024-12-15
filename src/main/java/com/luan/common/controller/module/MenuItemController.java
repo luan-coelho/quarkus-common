@@ -12,7 +12,7 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.UUID;
 
-@Path("/menu-item")
+@Path("/menu-items")
 public class MenuItemController extends BaseController<MenuItem, MenuItemResponseDto, UUID, MenuItemService, MenuItemMapper> {
 
     @Path("/{id}/add-sub-item/{subItemId}")

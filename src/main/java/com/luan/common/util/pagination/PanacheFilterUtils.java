@@ -1,10 +1,8 @@
 package com.luan.common.util.pagination;
 
 import io.quarkus.panache.common.Parameters;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.envers.Audited;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -23,13 +21,10 @@ public class PanacheFilterUtils {
             String sort,
             Class<T> entityClass) {
 
-        // Constrói os filtros
         QueryAndParameters queryAndParameters = buildQueryFromFilters(filterQueryParams, entityClass);
 
-        // Constrói a cláusula ORDER BY
         String orderByClause = buildOrderByClause(sort);
 
-        // Combina filtros e ordenação
         String finalQuery = queryAndParameters.query();
         if (!orderByClause.isEmpty()) {
             finalQuery += " order by " + orderByClause;
@@ -46,7 +41,7 @@ public class PanacheFilterUtils {
      * @return Um objeto contendo a query construída e os parâmetros associados.
      */
     public static QueryAndParameters buildQueryFromFilters(String filterQueryParams, Class<?> entityClass) {
-        validateFilterQueryParams(filterQueryParams); // Valida os filtros no início.
+        validateFilterQueryParams(filterQueryParams);
 
         if (filterQueryParams == null || filterQueryParams.isEmpty()) {
             return new QueryAndParameters("", new Parameters());
@@ -57,20 +52,17 @@ public class PanacheFilterUtils {
         String[] filters = filterQueryParams.split(",");
 
         for (int i = 0; i < filters.length; i++) {
-            String[] parts = filters[i].split(";"); // Usando ponto e vírgula como delimitador
+            String[] parts = filters[i].split(";");
             String fieldPath = parts[0].trim();
             Operator operator = Operator.fromValue(parts[1].trim());
             String paramName = "param" + i;
             String value = parts[2].trim();
 
-            // Ajusta o caminho do campo para coleções
             String adjustedFieldPath = adjustFieldPathForCollections(entityClass, fieldPath);
 
-            // Detecta o tipo do campo e converte, se necessário
             Field field = getFieldFromPath(entityClass, fieldPath);
             Object convertedValue = convertValueToFieldType(field, value);
 
-            // Constrói a consulta com base no operador
             switch (operator) {
                 case Operator.EQUALS:
                     query.add(adjustedFieldPath + " = :" + paramName);
@@ -103,7 +95,7 @@ public class PanacheFilterUtils {
     public static String buildOrderByClause(String sort) {
         String orderBy = "id asc";
         if (sort == null || sort.trim().isEmpty()) {
-            return orderBy; // Ordenação padrão
+            return orderBy;
         }
 
         String[] sortFields = sort.split(",");
@@ -119,9 +111,8 @@ public class PanacheFilterUtils {
             String fieldName = parts[0].trim();
             String direction = parts[1].trim().toLowerCase();
 
-            // Adiciona o campo e a direção ao ORDER BY
             if (!direction.equalsIgnoreCase("asc") && !direction.equalsIgnoreCase("desc")) {
-                return orderBy; // Ordenação padrão
+                return orderBy;
             }
 
             orderByClause.add(fieldName + " " + direction.toLowerCase());
@@ -150,10 +141,9 @@ public class PanacheFilterUtils {
             }
 
             if (i < fieldParts.length - 1) {
-                adjustedPath.append("."); // Adiciona o separador para os próximos níveis
+                adjustedPath.append(".");
             }
 
-            // Navega para o próximo nível
             currentClass = field.getType();
             if (isCollectionField(field)) {
                 currentClass = getCollectionElementType(field);
@@ -170,11 +160,14 @@ public class PanacheFilterUtils {
         Class<?> fieldType = field.getType();
 
         if (fieldType.equals(LocalDateTime.class)) {
-            // Converte a string para LocalDateTime
             return LocalDateTime.parse(value, DateTimeFormatter.ISO_DATE_TIME);
         }
-        // Adicione outras conversões necessárias, por exemplo, para Integer, Long, etc.
-        return value; // Retorna a string diretamente para tipos que não precisam de conversão
+
+        if (fieldType.equals(Boolean.class) || fieldType.equals(boolean.class)) {
+            return Boolean.parseBoolean(value);
+        }
+
+        return value;
     }
 
     private static Field getFieldFromClass(Class<?> entityClass, String fieldName) {
@@ -182,9 +175,9 @@ public class PanacheFilterUtils {
 
         while (currentClass != null) {
             try {
-                return currentClass.getDeclaredField(fieldName); // Busca o campo na classe atual
+                return currentClass.getDeclaredField(fieldName);
             } catch (NoSuchFieldException e) {
-                currentClass = currentClass.getSuperclass(); // Continua na classe pai
+                currentClass = currentClass.getSuperclass();
             }
         }
 
@@ -206,7 +199,7 @@ public class PanacheFilterUtils {
      */
     public static void validateFilterQueryParams(String filterQueryParams) {
         if (filterQueryParams == null || filterQueryParams.trim().isEmpty()) {
-            return; // Nenhum filtro enviado, válido.
+            return;
         }
 
         String[] filters = filterQueryParams.split(",");
@@ -226,7 +219,7 @@ public class PanacheFilterUtils {
             Field field = null;
 
             for (String part : fieldParts) {
-                field = getFieldIncludingSuperclasses(currentClass, part); // Busca o campo na classe ou superclasses
+                field = getFieldIncludingSuperclasses(currentClass, part);
 
                 // Se o campo for uma coleção, verifica o tipo genérico
                 if (Collection.class.isAssignableFrom(field.getType())) {
@@ -238,7 +231,8 @@ public class PanacheFilterUtils {
             return field;
         } catch (NoSuchFieldException e) {
             throw new IllegalArgumentException(
-                    "O campo '" + fieldPath + "' não existe na entidade ou em suas superclasses: " + entityClass.getSimpleName());
+                    "O campo '" + fieldPath + "' não existe na entidade ou em suas superclasses: " + entityClass.getSimpleName()
+            );
         }
     }
 
@@ -267,7 +261,8 @@ public class PanacheFilterUtils {
             return (Class<?>) parameterizedType.getActualTypeArguments()[0];
         }
         throw new IllegalArgumentException(
-                "Não foi possível determinar o tipo dos elementos da coleção para o campo: " + field.getName());
+                "Não foi possível determinar o tipo dos elementos da coleção para o campo: " + field.getName()
+        );
     }
 
     @Getter
