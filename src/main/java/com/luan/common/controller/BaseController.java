@@ -1,6 +1,5 @@
 package com.luan.common.controller;
 
-import com.luan.common.mapper.BaseMapper;
 import com.luan.common.model.user.BaseEntity;
 import com.luan.common.service.Service;
 import com.luan.common.util.pagination.Pageable;
@@ -13,14 +12,20 @@ import lombok.Getter;
 @Getter
 @Produces(MediaType.APPLICATION_JSON)
 @SuppressWarnings({"CdiInjectionPointsInspection", "RestParamTypeInspection"})
-public abstract class BaseController<T extends BaseEntity, DTO, UUID, S extends Service<T, DTO, UUID>, M extends BaseMapper<T, DTO>> {
+public abstract class BaseController<T extends BaseEntity, DTO, UUID, S extends Service<T, DTO, UUID>> {
 
     @Inject
     S service;
 
     @GET
-    public Response getAll(Pageable pageable) {
+    public Response getAllWithPagination(Pageable pageable) {
         return Response.ok(service.findAllAndReturnDto(pageable)).build();
+    }
+
+    @GET
+    @Path("/all")
+    public Response getAll() {
+        return Response.ok(service.findAllAndReturnDto()).build();
     }
 
     @Path("/{id}")

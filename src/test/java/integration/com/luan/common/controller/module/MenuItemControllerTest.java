@@ -50,7 +50,7 @@ class MenuItemControllerTest extends BaseControllerTest {
                 .header("Content-Type", MediaType.APPLICATION_JSON)
                 .body(json)
                 .when()
-                .post("/menu-item")
+                .post("/menu-items")
                 .then()
                 .log().all()
                 .statusCode(Response.Status.CREATED.getStatusCode())
@@ -86,7 +86,7 @@ class MenuItemControllerTest extends BaseControllerTest {
                 .header("Content-Type", MediaType.APPLICATION_JSON)
                 .body(json)
                 .when()
-                .put("/menu-item/" + menuItem.getId())
+                .put("/menu-items/" + menuItem.getId())
                 .then()
                 .log().all()
                 .statusCode(Response.Status.OK.getStatusCode())
@@ -121,7 +121,7 @@ class MenuItemControllerTest extends BaseControllerTest {
                 .header("Content-Type", MediaType.APPLICATION_JSON)
                 .body(json)
                 .when()
-                .post("/menu-item")
+                .post("/menu-items")
                 .then()
                 .log().all()
                 .statusCode(Response.Status.CREATED.getStatusCode())
@@ -153,7 +153,7 @@ class MenuItemControllerTest extends BaseControllerTest {
         given().contentType(ContentType.JSON)
                 .header("Content-Type", MediaType.APPLICATION_JSON)
                 .when()
-                .patch("/menu-item/" + menuItem.getId() + "/add-sub-item/" + subItem.getId())
+                .patch("/menu-items/" + menuItem.getId() + "/add-sub-item/" + subItem.getId())
                 .then()
                 .log().all()
                 .statusCode(Response.Status.OK.getStatusCode())
@@ -182,7 +182,7 @@ class MenuItemControllerTest extends BaseControllerTest {
         given().contentType(ContentType.JSON)
                 .header("Content-Type", MediaType.APPLICATION_JSON)
                 .when()
-                .delete("/menu-item/" + menuItem.getId())
+                .delete("/menu-items/" + menuItem.getId())
                 .then()
                 .log().all()
                 .statusCode(Response.Status.NO_CONTENT.getStatusCode());
@@ -202,7 +202,7 @@ class MenuItemControllerTest extends BaseControllerTest {
         given().contentType(ContentType.JSON)
                 .header("Content-Type", MediaType.APPLICATION_JSON)
                 .when()
-                .delete("/menu-item/" + subItem.getId())
+                .delete("/menu-items/" + subItem.getId())
                 .then()
                 .log().all()
                 .statusCode(Response.Status.BAD_REQUEST.getStatusCode());
@@ -232,7 +232,7 @@ class MenuItemControllerTest extends BaseControllerTest {
 
     @Override
     public String getUrl() {
-        return "/menu-item";
+        return "/menu-items";
     }
 
 }
