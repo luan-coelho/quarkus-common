@@ -59,7 +59,6 @@ class MenuItemControllerTest extends BaseControllerTest {
                 .body("description", is(menuItem.getDescription()))
                 .body("route", is(menuItem.getRoute()))
                 .body("icon", is(menuItem.getIcon()))
-                .body("position", is(menuItem.getPosition()))
                 .body("active", is(menuItem.isActive()));
     }
 
@@ -71,7 +70,6 @@ class MenuItemControllerTest extends BaseControllerTest {
         menuItem.setLabel("Funcionários");
         menuItem.setRoute("/employees");
         menuItem.setIcon("fa fa-users");
-        menuItem.setPosition(1);
         menuItem.setActive(true);
 
         String json;
@@ -95,7 +93,6 @@ class MenuItemControllerTest extends BaseControllerTest {
                 .body("description", is(menuItem.getDescription()))
                 .body("route", is(menuItem.getRoute()))
                 .body("icon", is(menuItem.getIcon()))
-                .body("position", is(menuItem.getPosition()))
                 .body("active", is(menuItem.isActive()));
     }
 
@@ -129,14 +126,12 @@ class MenuItemControllerTest extends BaseControllerTest {
                 .body("label", is(menuItem.getLabel()))
                 .body("route", is(menuItem.getRoute()))
                 .body("icon", is(menuItem.getIcon()))
-                .body("position", is(menuItem.getPosition()))
                 .body("active", is(menuItem.isActive()))
                 .body("subItems", hasSize(1))
                 .body("subItems[0].id", is(subItem.getId().toString()))
                 .body("subItems[0].label", is(subItem.getLabel()))
                 .body("subItems[0].route", is(subItem.getRoute()))
                 .body("subItems[0].icon", is(subItem.getIcon()))
-                .body("subItems[0].position", is(subItem.getPosition()))
                 .body("subItems[0].active", is(subItem.isActive()));
     }
 
@@ -162,7 +157,6 @@ class MenuItemControllerTest extends BaseControllerTest {
                 .body("description", is(menuItem.getDescription()))
                 .body("route", is(menuItem.getRoute()))
                 .body("icon", is(menuItem.getIcon()))
-                .body("position", is(menuItem.getPosition()))
                 .body("active", is(menuItem.isActive()))
                 .body("subItems", hasSize(1))
                 .body("subItems[0].id", is(subItem.getId().toString()))
@@ -170,7 +164,6 @@ class MenuItemControllerTest extends BaseControllerTest {
                 .body("subItems[0].description", is(subItem.getDescription()))
                 .body("subItems[0].route", is(subItem.getRoute()))
                 .body("subItems[0].icon", is(subItem.getIcon()))
-                .body("subItems[0].position", is(subItem.getPosition()))
                 .body("subItems[0].active", is(subItem.isActive()));
     }
 
@@ -214,7 +207,6 @@ class MenuItemControllerTest extends BaseControllerTest {
         menuItem.setRoute(route);
         menuItem.setDescription("Descrição do menu");
         menuItem.setIcon(icon);
-        menuItem.setPosition(1);
         menuItem.setActive(true);
         return menuItem;
     }

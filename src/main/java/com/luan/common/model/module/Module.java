@@ -5,6 +5,9 @@ import com.luan.common.model.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 import java.util.List;
 
@@ -18,8 +21,16 @@ public class Module extends BaseEntity {
 
     private String name;
 
+    @Column(columnDefinition = "json", name = "menu_items")
     @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "module_menu_item",
+            joinColumns = @JoinColumn(name = "module_id"),
+            inverseJoinColumns = @JoinColumn(name = "menu_item_id"))
     private List<MenuItem> menuItems;
+
+    @Column(columnDefinition = "json", name = "menu_items_order")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private String menuItemsOrder;
 
     @ManyToMany(mappedBy = "modules")
     private List<User> users;

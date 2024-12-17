@@ -41,7 +41,7 @@ public abstract class BaseController<T extends BaseEntity, DTO, UUID, S extends 
 
     @Path("/{id}")
     @PUT
-    public Response updateById(T entity, @PathParam("id") UUID id) {
+    public Response updateById(@PathParam("id") UUID id, T entity) {
         return Response.ok(service.updateByIdAndReturnDto(id, entity)).build();
     }
 

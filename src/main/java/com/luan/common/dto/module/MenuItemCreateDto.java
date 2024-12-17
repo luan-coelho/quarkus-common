@@ -9,7 +9,6 @@ public record MenuItemCreateDto(
         String label,
         String route,
         String icon,
-        Integer position,
         List<MenuItemResponseDto> subItems
 ) {
 }

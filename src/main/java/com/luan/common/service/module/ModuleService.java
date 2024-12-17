@@ -1,5 +1,6 @@
 package com.luan.common.service.module;
 
+import com.luan.common.dto.module.MenuItemOrder;
 import com.luan.common.dto.module.ModuleResponseDto;
 import com.luan.common.mapper.module.ModuleMapper;
 import com.luan.common.model.module.MenuItem;
@@ -8,10 +9,11 @@ import com.luan.common.model.user.User;
 import com.luan.common.repository.module.ModuleRepository;
 import com.luan.common.service.BaseService;
 import com.luan.common.service.user.UserService;
+import com.luan.common.util.JsonUtils;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import org.hibernate.Hibernate;
+import lombok.SneakyThrows;
 
 import java.util.List;
 import java.util.UUID;
@@ -69,6 +71,15 @@ public class ModuleService extends BaseService<Module, ModuleResponseDto, UUID, 
     public List<ModuleResponseDto> getModulesByUserId(UUID userId) {
         List<Module> modules = getRepository().findByUserId(userId);
         return getMapper().toDto(modules);
+    }
+
+    @SneakyThrows
+    public ModuleResponseDto updateMenuItemsOrder(UUID moduleId, List<MenuItemOrder> menuItemsOrder) {
+        Module module = findById(moduleId);
+        String json = JsonUtils.toJson(menuItemsOrder);
+        module.setMenuItemsOrder(json);
+        update(module);
+        return getMapper().toDto(module);
     }
 
 }

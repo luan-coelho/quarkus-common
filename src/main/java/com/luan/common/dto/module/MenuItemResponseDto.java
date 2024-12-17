@@ -1,6 +1,7 @@
 package com.luan.common.dto.module;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,8 +14,9 @@ public record MenuItemResponseDto(
         String description,
         String route,
         String icon,
-        Integer position,
         List<MenuItemResponseDto> subItems,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt,
         boolean active) implements Serializable {
 
 }

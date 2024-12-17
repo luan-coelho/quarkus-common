@@ -256,7 +256,6 @@ class PanacheFilterUtilsTest {
         menuItem.setRoute(route);
         menuItem.setDescription("Descrição do menu");
         menuItem.setIcon(icon);
-        menuItem.setPosition(1);
         menuItem.setActive(true);
         return menuItem;
     }

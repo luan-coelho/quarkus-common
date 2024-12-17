@@ -18,7 +18,10 @@ public abstract class BaseEntity {
     @Column(columnDefinition = "UUID")
     private UUID id;
 
+    @Column(nullable = false, name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Version
@@ -36,7 +39,7 @@ public abstract class BaseEntity {
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

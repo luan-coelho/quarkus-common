@@ -140,7 +140,6 @@ class ModuleControllerTest extends BaseControllerTest {
         menuItem.setLabel("Usuários");
         menuItem.setRoute("/users");
         menuItem.setIcon("fa fa-users");
-        menuItem.setPosition(1);
         menuItem.setActive(true);
         saveInAnotherTransaction(menuItem);
 
@@ -159,7 +158,6 @@ class ModuleControllerTest extends BaseControllerTest {
                 .body("menuItems[0].description", is(menuItem.getDescription()))
                 .body("menuItems[0].route", is(menuItem.getRoute()))
                 .body("menuItems[0].icon", is(menuItem.getIcon()))
-                .body("menuItems[0].position", is(menuItem.getPosition()))
                 .body("menuItems[0].active", is(menuItem.isActive()))
                 .body("menuItems[0].parent", is(nullValue()))
                 .body("active", is(module.isActive()));
@@ -177,7 +175,6 @@ class ModuleControllerTest extends BaseControllerTest {
         menuItem.setLabel("Usuários");
         menuItem.setRoute("/users");
         menuItem.setIcon("fa fa-users");
-        menuItem.setPosition(1);
         menuItem.setActive(true);
         saveInAnotherTransaction(menuItem);
         addMenuItemToModuleInAnotherTransaction(module, menuItem);
