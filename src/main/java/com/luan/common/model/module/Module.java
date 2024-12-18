@@ -22,7 +22,7 @@ public class Module extends BaseEntity {
     private String name;
 
     @Column(columnDefinition = "json", name = "menu_items")
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(name = "module_menu_item",
             joinColumns = @JoinColumn(name = "module_id"),
             inverseJoinColumns = @JoinColumn(name = "menu_item_id"))
