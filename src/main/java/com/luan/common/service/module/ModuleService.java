@@ -68,6 +68,17 @@ public class ModuleService extends BaseService<Module, ModuleResponseDto, UUID, 
         return getMapper().toDto(module);
     }
 
+    @Transactional
+    public ModuleResponseDto removeMenuItem(UUID moduleId, UUID menuItemId) {
+        Module module = findById(moduleId);
+        List<MenuItem> menuItems = module.getMenuItems();
+        if (menuItems != null && !menuItems.isEmpty()) {
+            menuItems.removeIf(item -> item.getId().equals(menuItemId));
+        }
+        update(module);
+        return getMapper().toDto(module);
+    }
+
     public List<ModuleResponseDto> getModulesByUserId(UUID userId) {
         List<Module> modules = getRepository().findByUserId(userId);
         return getMapper().toDto(modules);

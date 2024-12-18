@@ -28,6 +28,12 @@ public class ModuleController extends BaseController<Module, ModuleResponseDto, 
         return Response.ok(getService().addMenuItem(id, menuItemId)).build();
     }
 
+    @Path("/{id}/remove-menu-item/{menuItemId}")
+    @PATCH
+    public Response removeMenuItem(@PathParam("id") UUID id, @PathParam("menuItemId") UUID menuItemId) {
+        return Response.ok(getService().removeMenuItem(id, menuItemId)).build();
+    }
+
     @Path("/{id}/update-menu-items-order")
     @PATCH
     public Response updateMenuItemsOrder(@PathParam("id") UUID id, List<MenuItemOrder> menuItemsOrder) {
