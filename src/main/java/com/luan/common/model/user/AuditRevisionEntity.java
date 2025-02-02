@@ -12,9 +12,10 @@ import org.hibernate.envers.RevisionEntity;
 @Getter
 @Entity
 @RevisionEntity(AuditRevisionListener.class)
-@Table(name = "revinfo")
+@Table(name = "revinfo", schema = "audit")
 public class AuditRevisionEntity extends DefaultRevisionEntity {
 
     private String username;
+    private String cpf;
 
 }

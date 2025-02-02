@@ -2,7 +2,6 @@ package com.luan.common.service;
 
 import com.luan.common.annotation.AuditFieldLabel;
 import com.luan.common.mapper.BaseMapper;
-import com.luan.common.model.module.MenuItem;
 import com.luan.common.model.user.AuditRevisionEntity;
 import com.luan.common.model.user.BaseEntity;
 import com.luan.common.repository.Repository;
@@ -26,7 +25,10 @@ import org.hibernate.exception.ConstraintViolationException;
 
 import java.lang.reflect.Field;
 import java.time.temporal.Temporal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -169,7 +171,6 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
         this.repository.deleteAll();
     }
 
-    @Transactional
     @Override
     public List<Revision<T>> findAllRevisions(UUID entityId) {
         AuditReader reader = AuditReaderFactory.get(repository.getEntityManager());
@@ -181,6 +182,10 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
             revisionObj.setRevisionId(revisionNumber);
             revisionObj.setRevisionType(getRevisionType(reader, entityId, revisionNumber));
             revisionObj.setEntity(entity);
+            revisionObj.setRevisionDate(reader.getRevisionDate(revisionNumber));
+            AuditRevisionEntity revision = reader.findRevision(AuditRevisionEntity.class, revisionNumber);
+            revisionObj.setUsername(revision.getUsername());
+            revisionObj.setCpf(revision.getCpf());
             revisionList.add(revisionObj);
         }
         return revisionList;

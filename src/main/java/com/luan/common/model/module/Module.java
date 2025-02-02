@@ -7,12 +7,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
+import org.hibernate.envers.Audited;
 import org.hibernate.type.SqlTypes;
 
 import java.util.List;
 
 @Getter
 @Setter
+@Audited
 @Entity
 @Table(name = "module", uniqueConstraints = {
         @UniqueConstraint(name = "pk_module", columnNames = {"id"}),

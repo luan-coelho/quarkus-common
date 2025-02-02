@@ -7,11 +7,13 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.envers.Audited;
 
 import java.util.List;
 
 @Getter
 @Setter
+@Audited
 @Entity
 @Table(name = "menu_item", uniqueConstraints = {
         @UniqueConstraint(name = "pk_menu_item", columnNames = {"id"}),
