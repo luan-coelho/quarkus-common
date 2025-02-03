@@ -12,6 +12,8 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(config = QuarkusMappingConfig.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ModuleMapper extends BaseMapper<Module, ModuleResponseDto> {
 
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Override
     void copyProperties(Module source, @MappingTarget Module target);
