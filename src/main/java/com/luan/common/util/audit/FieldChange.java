@@ -13,8 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 public class FieldChange {
 
-    private String label;
     private String name;
+    private String label;
     private Object oldValue;
     private Object newValue;
     private int order;

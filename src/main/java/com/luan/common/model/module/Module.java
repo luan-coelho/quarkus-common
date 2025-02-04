@@ -1,5 +1,6 @@
 package com.luan.common.model.module;
 
+import com.luan.common.annotation.AuditFieldLabel;
 import com.luan.common.model.user.BaseEntity;
 import com.luan.common.model.user.User;
 import jakarta.persistence.*;
@@ -21,6 +22,7 @@ import java.util.List;
 })
 public class Module extends BaseEntity {
 
+    @AuditFieldLabel("Nome")
     private String name;
 
     @Column(columnDefinition = "json", name = "menu_items")
