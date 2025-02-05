@@ -12,11 +12,9 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RevisionComparison {
+public class RevisionComparison<T> {
 
-    private String revisionAuthor;
-    private Date revisionDateTime;
+    private Revision<T> revision;
     private List<FieldChange> fieldChanges;
-    private String revisionType;
 
 }

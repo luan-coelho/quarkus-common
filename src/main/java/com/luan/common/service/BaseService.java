@@ -23,7 +23,6 @@ import org.hibernate.envers.query.AuditEntity;
 import org.hibernate.exception.ConstraintViolationException;
 
 import java.lang.reflect.Field;
-import java.time.temporal.Temporal;
 import java.util.*;
 
 @Slf4j
@@ -188,7 +187,7 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
     }
 
     @Override
-    public RevisionComparison compareWithPreviousRevision(UUID entityId, Integer revisionId) {
+    public RevisionComparison<T> compareWithPreviousRevision(UUID entityId, Integer revisionId) {
         AuditReader auditReader = AuditReaderFactory.get(repository.getEntityManager());
 
         // Obtém todas as revisões para a entidade
@@ -205,7 +204,7 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
                 : null;
 
         // Carrega as entidades das revisões
-        Object currentEntity = auditReader.find(entityClass, entityId, revisionId);
+        T currentEntity = auditReader.find(entityClass, entityId, revisionId);
         Object previousEntity = previousRevisionId != null
                 ? auditReader.find(entityClass, entityId, previousRevisionId)
                 : null;
@@ -217,12 +216,15 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
         AuditRevisionEntity revisionEntity = auditReader.findRevision(AuditRevisionEntity.class, revisionId);
         RevisionType revisionType = getRevisionType(auditReader, entityId, revisionId);
 
-        return new RevisionComparison(
-                revisionEntity.getUsername(),
-                revisionEntity.getRevisionDate(),
-                fieldChanges,
-                revisionType.toString()
-        );
+        Revision<T> revision = new Revision<>();
+        revision.setRevisionId(revisionId);
+        revision.setRevisionType(revisionType);
+        revision.setEntity(currentEntity);
+        revision.setRevisionDate(revisionEntity.getRevisionDate());
+        revision.setUsername(revisionEntity.getUsername());
+        revision.setCpf(revisionEntity.getCpf());
+
+        return new RevisionComparison<T>(revision, fieldChanges);
     }
 
     private List<FieldChange> compareEntities(Object oldEntity, Object newEntity) {
