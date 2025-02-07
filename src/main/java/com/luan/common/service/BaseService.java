@@ -227,11 +227,27 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
         return new RevisionComparison<T>(revision, fieldChanges);
     }
 
+    @Override
+    public List<RevisionComparison<T>> findAllRevisionsComparisons(UUID entityId) {
+        List<Revision<T>> revisions = findAllRevisions(entityId);
+        List<RevisionComparison<T>> comparisons = new ArrayList<>();
+        for (Revision<T> revision : revisions) {
+            RevisionComparison<T> comparison = compareWithPreviousRevision(entityId, revision.getRevisionId().intValue());
+            comparisons.add(comparison);
+        }
+        return comparisons;
+    }
+
     private List<FieldChange> compareEntities(Object oldEntity, Object newEntity) {
         List<FieldChange> changes = new ArrayList<>();
-        if (oldEntity == null && newEntity == null) return changes;
 
-        Class<?> clazz = oldEntity != null ? oldEntity.getClass() : newEntity.getClass();
+        if (oldEntity == null) {
+            return new ArrayList<>();
+        }
+
+        if (newEntity == null) return changes;
+
+        Class<?> clazz = oldEntity.getClass();
         List<Field> fields = getAllFields(clazz);
 
         for (Field field : fields) {

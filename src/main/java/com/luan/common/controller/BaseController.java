@@ -76,4 +76,10 @@ public abstract class BaseController<T extends BaseEntity, DTO, UUID, S extends 
         return Response.ok(service.compareWithPreviousRevision(id, revision)).build();
     }
 
+    @Path("/{id}/revisions/comparisons")
+    @GET
+    public Response findAllRevisionsComparisons(@PathParam("id") UUID id) {
+        return Response.ok(service.findAllRevisionsComparisons(id)).build();
+    }
+
 }

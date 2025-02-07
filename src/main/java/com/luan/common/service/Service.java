@@ -46,7 +46,9 @@ public interface Service<T, DTO, UUID> {
 
     List<Revision<T>> findAllRevisions(UUID id);
 
-    RevisionComparison compareWithPreviousRevision(UUID entityId, Integer revisionId);
+    RevisionComparison<T> compareWithPreviousRevision(UUID entityId, Integer revisionId);
+
+    List<RevisionComparison<T>> findAllRevisionsComparisons(UUID entityId);
 
 }
 
