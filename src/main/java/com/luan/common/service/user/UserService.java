@@ -8,21 +8,38 @@ import com.luan.common.repository.user.UserRepository;
 import com.luan.common.service.BaseService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.NotFoundException;
 
 import java.util.UUID;
 
 @ApplicationScoped
 public class UserService extends BaseService<User, UserResponseDto, UUID, UserRepository, UserMapper> {
 
-    protected UserService() {
+    public UserService() {
         super(User.class);
     }
 
     @Transactional
     public User save(User entity) {
         Address address = entity.getAddress();
-        address.setUser(entity);
+        if (address != null) {
+            address.setUser(entity);
+        }
         return super.save(entity);
+    }
+
+    @Transactional
+    public User saveAdmin() {
+        User administrator = getRepository().findByEmail("admin@gmail.com");
+        if (administrator == null) {
+            administrator = new User();
+            administrator.setName("Admin");
+            administrator.setEmail("admin@gmail.com");
+            administrator.setPassword("admin");
+            administrator.setCpf("00000000000");
+            save(administrator);
+        }
+        return administrator;
     }
 
 }

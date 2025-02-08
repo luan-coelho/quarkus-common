@@ -11,7 +11,11 @@ import java.util.List;
 public class Repository<T, UUID> implements PanacheRepositoryBase<T, UUID> {
 
     public DataPagination<T> listAll(Pageable pageable) {
-        QueryAndParameters qp = PanacheFilterUtils.buildQueryFromFiltersAndSort(pageable.getFilters(), pageable.getSort(), getEntityClass());
+        QueryAndParameters qp = PanacheFilterUtils.buildQueryFromFiltersAndSort(
+                pageable.getFilters(),
+                pageable.getSort(),
+                getEntityClass()
+        );
         PanacheQuery<T> panacheQuery = !qp.query().isEmpty()
                 ? find(qp.query(), qp.parameters())
                 : findAll();

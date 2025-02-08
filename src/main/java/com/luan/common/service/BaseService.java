@@ -173,15 +173,14 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
         List<Revision<T>> revisionList = new ArrayList<>();
         for (Number revisionNumber : revisionsNumbers) {
             T entity = reader.find(entityClass, entityId, revisionNumber.intValue());
-            Revision<T> revisionObj = new Revision<>();
-            revisionObj.setRevisionId(revisionNumber);
-            revisionObj.setRevisionType(getRevisionType(reader, entityId, revisionNumber));
-            revisionObj.setEntity(entity);
-            revisionObj.setRevisionDate(reader.getRevisionDate(revisionNumber));
-            AuditRevisionEntity revision = reader.findRevision(AuditRevisionEntity.class, revisionNumber);
-            revisionObj.setUsername(revision.getUsername());
-            revisionObj.setCpf(revision.getCpf());
-            revisionList.add(revisionObj);
+            Revision<T> revision = new Revision<>();
+            revision.setId(revisionNumber);
+            revision.setType(getRevisionType(reader, entityId, revisionNumber));
+            revision.setEntity(entity);
+            revision.setDate(reader.getRevisionDate(revisionNumber));
+            AuditRevisionEntity auditRevisionEntity = reader.findRevision(AuditRevisionEntity.class, revisionNumber);
+            revision.setUser(auditRevisionEntity.getUser());
+            revisionList.add(revision);
         }
         return revisionList;
     }
@@ -213,28 +212,36 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
         List<FieldChange> fieldChanges = compareEntities(previousEntity, currentEntity);
 
         // Obtém metadados da revisão atual
-        AuditRevisionEntity revisionEntity = auditReader.findRevision(AuditRevisionEntity.class, revisionId);
+        AuditRevisionEntity auditRevisionEntity = auditReader.findRevision(AuditRevisionEntity.class, revisionId);
         RevisionType revisionType = getRevisionType(auditReader, entityId, revisionId);
 
         Revision<T> revision = new Revision<>();
-        revision.setRevisionId(revisionId);
-        revision.setRevisionType(revisionType);
+        revision.setId(revisionId);
+        revision.setType(revisionType);
         revision.setEntity(currentEntity);
-        revision.setRevisionDate(revisionEntity.getRevisionDate());
-        revision.setUsername(revisionEntity.getUsername());
-        revision.setCpf(revisionEntity.getCpf());
+        revision.setDate(auditRevisionEntity.getRevisionDate());
+        revision.setUser(auditRevisionEntity.getUser());
 
         return new RevisionComparison<T>(revision, fieldChanges);
     }
 
     @Override
     public List<RevisionComparison<T>> findAllRevisionsComparisons(UUID entityId) {
-        List<Revision<T>> revisions = findAllRevisions(entityId);
+        AuditReader auditReader = AuditReaderFactory.get(repository.getEntityManager());
+        List<Number> revisionsNumbers = auditReader.getRevisions(entityClass, entityId);
+
         List<RevisionComparison<T>> comparisons = new ArrayList<>();
-        for (Revision<T> revision : revisions) {
-            RevisionComparison<T> comparison = compareWithPreviousRevision(entityId, revision.getRevisionId().intValue());
+        for (Number revisionNumber : revisionsNumbers) {
+            RevisionComparison<T> comparison = compareWithPreviousRevision(entityId, revisionNumber.intValue());
             comparisons.add(comparison);
         }
+
+        // Ordena as comparações com base na data da revisão mais recente para a mais antiga
+        comparisons.sort(Comparator.comparing(
+                RevisionComparison::getRevision,
+                Comparator.comparing(Revision::getDate, Comparator.reverseOrder())
+        ));
+
         return comparisons;
     }
 
@@ -275,8 +282,8 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
             }
 
             try {
-                Object oldValue = oldEntity != null ? field.get(oldEntity) : null;
-                Object newValue = newEntity != null ? field.get(newEntity) : null;
+                Object oldValue = field.get(oldEntity);
+                Object newValue = field.get(newEntity);
 
                 if (!Objects.equals(oldValue, newValue)) {
                     FieldChange change = new FieldChange();

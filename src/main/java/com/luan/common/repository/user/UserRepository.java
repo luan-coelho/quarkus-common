@@ -9,4 +9,8 @@ import java.util.UUID;
 @ApplicationScoped
 public class UserRepository extends Repository<User, UUID> {
 
+    public User findByEmail(String email) {
+        return find("email", email).firstResult();
+    }
+
 }

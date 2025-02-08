@@ -1,12 +1,12 @@
 package com.luan.common.util.audit;
 
+import com.luan.common.model.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.envers.RevisionType;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Setter
@@ -15,11 +15,10 @@ import java.util.Date;
 @NoArgsConstructor
 public class Revision<T> {
 
-    private Number revisionId;
-    private RevisionType revisionType;
-    private String username;
-    private String cpf;
-    private Date revisionDate;
+    private Number id;
+    private RevisionType type;
+    private User user;
+    private Date date;
     private T entity;
 
 }
