@@ -1,5 +1,6 @@
 package com.luan.common.mapper.user;
 
+import com.luan.common.dto.user.CreateAdminUserDto;
 import com.luan.common.dto.user.UserResponseDto;
 import com.luan.common.mapper.BaseMapper;
 import com.luan.common.mapper.QuarkusMappingConfig;
@@ -23,5 +24,7 @@ public interface UserMapper extends BaseMapper<User, UserResponseDto> {
 
     @Override
     DataPagination<UserResponseDto> toDto(DataPagination<User> target);
+
+    User toEntity(CreateAdminUserDto source);
 
 }

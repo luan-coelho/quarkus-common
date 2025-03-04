@@ -1,6 +1,6 @@
 package com.luan.common.handle;
 
-import com.luan.common.handle.rest.response.ConstraintErrorResponse;
+import com.luan.common.handle.rest.response.ConstraintProblemDetails;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.core.Response;
@@ -23,12 +23,12 @@ public class ConstraintViolationExceptionMapper extends HandleExceptionMapper<Co
 
     @Override
     protected String getDetail() {
-        return "Validation failed";
+        return "Validação falhou";
     }
 
     @Override
     public Response toResponse(ConstraintViolationException exception) {
-        ConstraintErrorResponse constraintErrorResponse = this.mapper.copyProperties(buildResponse(exception, uriInfo));
+        ConstraintProblemDetails constraintErrorResponse = this.mapper.copyProperties(buildResponse(exception, uriInfo));
         constraintErrorResponse.addErrors(exception.getConstraintViolations());
         return getResponse(constraintErrorResponse);
     }

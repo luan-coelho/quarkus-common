@@ -1,6 +1,6 @@
 package com.luan.common.handle;
 
-import com.luan.common.handle.rest.response.ErrorResponse;
+import com.luan.common.handle.rest.response.ProblemDetails;
 import com.luan.common.mapper.ErrorResponseMapper;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Context;
@@ -29,11 +29,11 @@ public abstract class HandleExceptionMapper<T extends Exception> {
     abstract int getStatus();
 
     public Response toResponse(T exception) {
-        ErrorResponse errorResponse = buildResponse(exception, uriInfo);
+        ProblemDetails errorResponse = buildResponse(exception, uriInfo);
         return getResponse(errorResponse);
     }
 
-    protected ErrorResponse buildResponse(T exception, UriInfo uriInfo) {
+    protected ProblemDetails buildResponse(T exception, UriInfo uriInfo) {
         String type = getType();
         String title = getTitle();
         int status = getStatus();
@@ -41,10 +41,10 @@ public abstract class HandleExceptionMapper<T extends Exception> {
                 ? getDetail()
                 : (exception.getCause() != null ? exception.getCause().getMessage() : exception.getMessage());
         String instance = uriInfo.getRequestUri().toString();
-        return new ErrorResponse(type, title, status, detail, instance);
+        return new ProblemDetails(type, title, status, detail, instance);
     }
 
-    protected Response getResponse(ErrorResponse errorResponse) {
+    protected Response getResponse(ProblemDetails errorResponse) {
         int status = errorResponse.getStatus();
         String mediaType = MediaType.APPLICATION_JSON;
         return Response.status(status).entity(errorResponse).type(mediaType).build();

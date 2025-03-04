@@ -13,4 +13,16 @@ public class UserRepository extends Repository<User, UUID> {
         return find("email", email).firstResult();
     }
 
+    public User findByCpf(String cpf) {
+        return find("cpf", cpf).firstResult();
+    }
+
+    public boolean existsByCpf(String cpf) {
+        return find("cpf", cpf).count() > 0;
+    }
+
+    public boolean existsByEmail(String email) {
+        return find("email", email).count() > 0;
+    }
+
 }

@@ -20,6 +20,7 @@ import java.util.List;
 public class User extends BaseEntity {
 
     private String name;
+    private String surname;
     private String email;
     private String cpf;
     private String password;

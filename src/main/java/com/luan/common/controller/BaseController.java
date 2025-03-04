@@ -15,7 +15,7 @@ import lombok.Getter;
 public abstract class BaseController<T extends BaseEntity, DTO, UUID, S extends Service<T, DTO, UUID>> {
 
     @Inject
-    S service;
+    protected S service;
 
     @GET
     public Response getAllWithPagination(Pageable pageable) {

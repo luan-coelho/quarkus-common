@@ -12,7 +12,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class ErrorResponse implements Serializable {
+public class ProblemDetails implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1308690675848099013L;
