@@ -22,6 +22,10 @@ public class Repository<T, UUID> implements PanacheRepositoryBase<T, UUID> {
         return buildDataPagination(pageable, panacheQuery);
     }
 
+    public List<T> findByIds(List<UUID> ids) {
+        return list("id in ?1", ids);
+    }
+
     public boolean existsById(UUID id) {
         return count("id", id) > 0;
     }

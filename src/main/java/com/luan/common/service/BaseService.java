@@ -60,6 +60,10 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
                 .orElseThrow(() -> new NotFoundException("Entidade não encontrada"));
     }
 
+    public List<T> findByIds(List<UUID> uuids) {
+        return this.repository.findByIds(uuids);
+    }
+
     @Override
     public DTO findByIdAndReturnDto(UUID uuid) {
         return this.mapper.toDto(findById(uuid));

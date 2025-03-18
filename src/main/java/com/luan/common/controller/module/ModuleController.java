@@ -1,10 +1,12 @@
 package com.luan.common.controller.module;
 
 import com.luan.common.controller.BaseController;
+import com.luan.common.dto.module.AddMenuItemsToModuleDto;
 import com.luan.common.dto.module.MenuItemOrder;
 import com.luan.common.dto.module.ModuleResponseDto;
 import com.luan.common.model.module.Module;
 import com.luan.common.service.module.ModuleService;
+import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -32,6 +34,18 @@ public class ModuleController extends BaseController<Module, ModuleResponseDto, 
     @PATCH
     public Response removeMenuItem(@PathParam("id") UUID id, @PathParam("menuItemId") UUID menuItemId) {
         return Response.ok(getService().removeMenuItem(id, menuItemId)).build();
+    }
+
+    @Path("/{id}/add-menu-items")
+    @PATCH
+    public Response addMenuItems(@PathParam("id") UUID id, AddMenuItemsToModuleDto dto) {
+        return Response.ok(getService().addMenuItems(id, dto.menuItemIds())).build();
+    }
+
+    @Path("/{id}/remove-menu-items")
+    @PATCH
+    public Response removeMenuItems(@PathParam("id") UUID id, AddMenuItemsToModuleDto dto) {
+        return Response.ok(getService().removeMenuItems(id, dto.menuItemIds())).build();
     }
 
     @Path("/{id}/update-menu-items-order")

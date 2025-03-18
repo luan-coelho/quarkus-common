@@ -1,0 +1,5 @@
+# Configura automaticamente o JDK 21 e Quarkus 3.17.8 quando entrar neste diretório
+# Para ativar, use o comando: sdk env
+
+java=21.0.6-tem
+quarkus=3.17.8
