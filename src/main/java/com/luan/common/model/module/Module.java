@@ -25,6 +25,9 @@ public class Module extends BaseEntity {
     @AuditFieldLabel("Nome")
     private String name;
 
+    @AuditFieldLabel("Descrição")
+    private String description;
+
     @Column(columnDefinition = "json", name = "menu_items")
     @ManyToMany
     @JoinTable(name = "module_menu_item",

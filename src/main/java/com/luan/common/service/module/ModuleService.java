@@ -1,5 +1,6 @@
 package com.luan.common.service.module;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.luan.common.dto.module.MenuItemOrder;
 import com.luan.common.dto.module.ModuleResponseDto;
 import com.luan.common.mapper.module.ModuleMapper;
@@ -29,6 +30,11 @@ public class ModuleService extends BaseService<Module, ModuleResponseDto, UUID, 
 
     protected ModuleService() {
         super(Module.class);
+    }
+
+    public List<ModuleResponseDto> getModulesByUserId(UUID userId) {
+        List<Module> modules = getRepository().findByUserId(userId);
+        return getMapper().toDto(modules);
     }
 
     @Transactional
@@ -97,18 +103,17 @@ public class ModuleService extends BaseService<Module, ModuleResponseDto, UUID, 
         return getMapper().toDto(module);
     }
 
-    public List<ModuleResponseDto> getModulesByUserId(UUID userId) {
-        List<Module> modules = getRepository().findByUserId(userId);
-        return getMapper().toDto(modules);
-    }
-
-    @SneakyThrows
+    @Transactional
     public ModuleResponseDto updateMenuItemsOrder(UUID moduleId, List<MenuItemOrder> menuItemsOrder) {
-        Module module = findById(moduleId);
-        String json = JsonUtils.toJson(menuItemsOrder);
-        module.setMenuItemsOrder(json);
-        update(module);
-        return getMapper().toDto(module);
+        try {
+            Module module = findById(moduleId);
+            String json = JsonUtils.toJson(menuItemsOrder);
+            module.setMenuItemsOrder(json);
+            update(module);
+            return getMapper().toDto(module);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
