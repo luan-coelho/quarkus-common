@@ -1,16 +1,19 @@
 package com.luan.common.controller.module;
 
+import java.util.UUID;
+
 import com.luan.common.controller.BaseController;
-import com.luan.common.dto.module.*;
+import com.luan.common.dto.module.AddMenuItemsToModuleDto;
+import com.luan.common.dto.module.ModuleResponseDto;
+import com.luan.common.dto.module.RemoveMenuItemsToModuleDto;
+import com.luan.common.dto.module.UpdateMenuItemsOrder;
 import com.luan.common.model.module.Module;
 import com.luan.common.service.module.ModuleService;
+
 import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.Response;
-
-import java.util.List;
-import java.util.UUID;
 
 @Path("/modules")
 public class ModuleController extends BaseController<Module, ModuleResponseDto, UUID, ModuleService> {
