@@ -21,7 +21,7 @@ public class Company extends BaseEntity {
     private String stateRegistration;
     private String corporateName;
 
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "companies")
     private List<Employee> employees;
 
 }
