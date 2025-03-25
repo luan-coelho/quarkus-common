@@ -12,7 +12,7 @@ import java.util.List;
 @Audited
 @Entity
 @Table(name = "companies", uniqueConstraints = {
-        @UniqueConstraint(name = "pk_company", columnNames = { "id" }),
+        @UniqueConstraint(name = "pk_company", columnNames = { "company_id" }),
 })
 public class Company extends BaseEntity {
 

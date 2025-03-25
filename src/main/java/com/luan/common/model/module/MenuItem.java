@@ -16,7 +16,7 @@ import java.util.List;
 @Audited
 @Entity
 @Table(name = "menu_item", uniqueConstraints = {
-        @UniqueConstraint(name = "pk_menu_item", columnNames = {"id"}),
+        @UniqueConstraint(name = "pk_menu_item", columnNames = { "menu_item_id" }),
 })
 public class MenuItem extends BaseEntity {
 

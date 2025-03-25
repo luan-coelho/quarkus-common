@@ -13,7 +13,7 @@ import org.hibernate.envers.Audited;
 @Audited
 @Entity
 @Table(name = "addresses", uniqueConstraints = {
-        @UniqueConstraint(name = "pk_address", columnNames = { "id" }),
+        @UniqueConstraint(name = "pk_address", columnNames = { "address_id" }),
 })
 public class Address extends BaseEntity {
 

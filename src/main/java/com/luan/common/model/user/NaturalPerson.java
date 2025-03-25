@@ -14,7 +14,7 @@ import lombok.Setter;
 @Audited
 @Entity
 @Table(name = "natural_persons", uniqueConstraints = {
-        @UniqueConstraint(name = "pk_natural_person", columnNames = { "id" }),
+        @UniqueConstraint(name = "pk_natural_person", columnNames = { "natural_person_id" }),
 })
 public class NaturalPerson extends BaseEntity {
 

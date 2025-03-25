@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Entity
 @Audited
 @Table(name = "user_module_accesses", uniqueConstraints = {
-        @UniqueConstraint(name = "pk_user_module_access", columnNames = { "id" }),
+        @UniqueConstraint(name = "pk_user_module_access", columnNames = { "user_module_access_id" }),
 })
 public class UserModuleAccess extends BaseEntity {
 

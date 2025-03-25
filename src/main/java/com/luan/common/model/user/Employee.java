@@ -12,6 +12,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +22,9 @@ import lombok.Setter;
 @Entity
 @Audited
 @Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "employees", uniqueConstraints = {
+        @UniqueConstraint(name = "pk_employee", columnNames = { "employee_id" }),
+})
 public abstract class Employee extends BaseEntity {
 
     @OneToOne(cascade = CascadeType.ALL)

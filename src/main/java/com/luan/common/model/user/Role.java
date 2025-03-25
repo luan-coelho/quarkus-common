@@ -2,6 +2,9 @@ package com.luan.common.model.user;
 
 public enum Role {
 
-    ADMIN
+    ADMIN,
+    USER,
+    COMPANY_ADMIN,
+    COMPANY_USER,
 
 }
