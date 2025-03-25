@@ -8,7 +8,7 @@ import jakarta.ws.rs.Path;
 
 import java.util.UUID;
 
-@Path("/natural-persons")
+@Path("/users/natural-persons")
 public class NaturalPersonController extends BaseController<User, UserResponseDto, UUID, UserService> {
 
 }

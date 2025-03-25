@@ -12,8 +12,8 @@ import org.hibernate.envers.Audited;
 @Setter
 @Audited
 @Entity
-@Table(name = "address", uniqueConstraints = {
-        @UniqueConstraint(name = "pk_address", columnNames = {"id"}),
+@Table(name = "addresses", uniqueConstraints = {
+        @UniqueConstraint(name = "pk_address", columnNames = { "id" }),
 })
 public class Address extends BaseEntity {
 

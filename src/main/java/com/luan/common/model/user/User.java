@@ -14,35 +14,33 @@ import java.util.List;
 @Setter
 @Entity
 @Audited
-@Table(name = "`user`", uniqueConstraints = {
-        @UniqueConstraint(name = "pk_user", columnNames = {"id"}),
+@Table(name = "`users`", uniqueConstraints = {
+                @UniqueConstraint(name = "pk_user", columnNames = { "id" }),
 })
 public class User extends BaseEntity {
 
-    private String name;
-    private String surname;
-    private String email;
-    private String cpf;
-    private String password;
-    private String primaryPhone;
-    private String secondaryPhone;
-    private LocalDate accessStartDate;
-    private LocalDate accessEndDate;
+        private String name;
+        private String surname;
+        private String email;
+        private String cpf;
+        private String password;
+        private String primaryPhone;
+        private String secondaryPhone;
+        private LocalDate accessStartDate;
+        private LocalDate accessEndDate;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", foreignKey = @ForeignKey(name = "fk_user_address"))
-    private Address address;
+        @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+        @JoinColumn(name = "user_id", referencedColumnName = "user_id", foreignKey = @ForeignKey(name = "fk_user_address"))
+        private Address address;
 
-    @ElementCollection(targetClass = Role.class)
-    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
-    @Enumerated(EnumType.STRING)
-    private List<Role> roles;
+        @ElementCollection(targetClass = Role.class)
+        @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
+        @Enumerated(EnumType.STRING)
+        private List<Role> roles;
 
-    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
-    @ManyToMany
-    @JoinTable(name = "user_module",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "module_id"))
-    private List<Module> modules;
+        @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+        @ManyToMany
+        @JoinTable(name = "user_module", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "module_id"))
+        private List<Module> modules;
 
 }

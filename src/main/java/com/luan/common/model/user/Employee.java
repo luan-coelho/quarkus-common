@@ -1,10 +1,19 @@
 package com.luan.common.model.user;
 
-import jakarta.persistence.*;
+import java.util.List;
+
+import org.hibernate.envers.Audited;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.envers.Audited;
 
 @Getter
 @Setter
@@ -16,9 +25,8 @@ public abstract class Employee extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "company_id", referencedColumnName = "id",
-            foreignKey = @ForeignKey(name = "fk_company_employee"))
-    private Company company;
+    @ManyToMany
+    @JoinTable(name = "employee_company", joinColumns = @JoinColumn(name = "employee_id"), inverseJoinColumns = @JoinColumn(name = "company_id"))
+    private List<Company> companies;
 
 }
