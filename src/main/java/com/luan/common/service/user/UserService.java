@@ -9,6 +9,7 @@ import com.luan.common.repository.user.UserRepository;
 import com.luan.common.service.BaseService;
 import com.luan.common.util.BrazilUtils;
 import com.luan.common.util.ValidationUtil;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;

@@ -1,7 +1,7 @@
 package com.luan.common.repository.module;
 
 import com.luan.common.model.module.Module;
-import com.luan.common.repository.Repository;
+import com.luan.common.repository.BaseRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
-public class ModuleRepository extends Repository<Module, UUID> {
+public class ModuleRepository extends BaseRepository<Module, UUID> {
 
     @Override
     public Optional<Module> findByIdOptional(UUID id) {

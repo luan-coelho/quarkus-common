@@ -8,33 +8,36 @@ import io.quarkus.panache.common.Page;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
-public class Repository<T, UUID> implements PanacheRepositoryBase<T, UUID> {
+/**
+ * @param <T>  Entity type
+ * @param <ID> Entity ID type
+ */
+public class BaseRepository<T, ID> implements PanacheRepositoryBase<T, ID> {
 
     public DataPagination<T> listAll(Pageable pageable) {
         QueryAndParameters qp = PanacheFilterUtils.buildQueryFromFiltersAndSort(
                 pageable.getFilters(),
                 pageable.getSort(),
-                getEntityClass()
-        );
+                getEntityClass());
         PanacheQuery<T> panacheQuery = !qp.query().isEmpty()
                 ? find(qp.query(), qp.parameters())
                 : findAll();
         return buildDataPagination(pageable, panacheQuery);
     }
 
-    public List<T> findByIds(List<UUID> ids) {
+    public List<T> findByIds(List<ID> ids) {
         return list("id in ?1", ids);
     }
 
-    public boolean existsById(UUID id) {
+    public boolean existsById(ID id) {
         return count("id", id) > 0;
     }
 
-    public void desactiveById(UUID id) {
+    public void desactiveById(ID id) {
         update("active = false where id = ?1", id);
     }
 
-    public void activeById(UUID id) {
+    public void activeById(ID id) {
         update("active = true where id = ?1", id);
     }
 

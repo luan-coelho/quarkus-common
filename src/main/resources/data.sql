@@ -20,7 +20,7 @@ VALUES ('123e4567-e89b-12d3-a456-426614174000', '223e4567-e89b-12d3-a456-4266141
 INSERT INTO module_menu_item (module_id, menu_item_id)
 VALUES ('123e4567-e89b-12d3-a456-426614174000', '08695e2e-1794-49b5-97d1-c75f02c6d42c');
 
-INSERT INTO "user" (active, version, created_at, updated_at, id, email, name, password)
+INSERT INTO "users" (active, version, created_at, updated_at, id, email, name, password)
 VALUES (true, 0, NOW(), NOW(), '123e4567-e89b-12d3-a456-426614174001', 'user@gmail.com', 'User', '123');
 
 INSERT INTO user_module (user_id, module_id)

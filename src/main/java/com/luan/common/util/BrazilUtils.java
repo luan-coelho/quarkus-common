@@ -39,4 +39,19 @@ public class BrazilUtils {
         return cep.replaceAll("[^\\d]", "");
     }
 
+    public static String addCnpjMask(String cnpj) {
+        if (cnpj == null || cnpj.length() != 14 || !cnpj.matches("\\d{14}")) {
+            throw new IllegalArgumentException("CNPJ inválido");
+        }
+        return cnpj.substring(0, 2) + "." + cnpj.substring(2, 5) + "." + cnpj.substring(5, 8) + "/"
+                + cnpj.substring(8, 12) + "-" + cnpj.substring(12);
+    }
+
+    public static String removeCnpjMask(String cnpj) {
+        if (cnpj == null) {
+            throw new IllegalArgumentException("CNPJ não pode ser nulo");
+        }
+        return cnpj.replaceAll("[^\\d]", "");
+    }
+    
 }

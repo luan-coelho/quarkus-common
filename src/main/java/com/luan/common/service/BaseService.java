@@ -4,7 +4,7 @@ import com.luan.common.annotation.AuditFieldLabel;
 import com.luan.common.mapper.BaseMapper;
 import com.luan.common.model.user.AuditRevisionEntity;
 import com.luan.common.model.user.BaseEntity;
-import com.luan.common.repository.Repository;
+import com.luan.common.repository.BaseRepository;
 import com.luan.common.util.audit.FieldChange;
 import com.luan.common.util.audit.Revision;
 import com.luan.common.util.audit.RevisionComparison;
@@ -28,8 +28,8 @@ import java.util.*;
 @Slf4j
 @RequiredArgsConstructor
 @SuppressWarnings({"CdiInjectionPointsInspection"})
-public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Repository<T, UUID>,
-        M extends BaseMapper<T, DTO>> implements Service<T, DTO, UUID> {
+public abstract class BaseService<T extends BaseEntity, DTO, ID, R extends BaseRepository<T, ID>,
+        M extends BaseMapper<T, DTO>> implements Service<T, DTO, ID> {
 
     @Getter
     @Inject
@@ -54,19 +54,19 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
     }
 
     @Override
-    public T findById(UUID uuid) {
+    public T findById(ID id) {
         return this.repository
-                .findByIdOptional(uuid)
+                .findByIdOptional(id)
                 .orElseThrow(() -> new NotFoundException("Entidade não encontrada"));
     }
 
-    public List<T> findByIds(List<UUID> uuids) {
-        return this.repository.findByIds(uuids);
+    public List<T> findByIds(List<ID> ids) {
+        return this.repository.findByIds(ids);
     }
 
     @Override
-    public DTO findByIdAndReturnDto(UUID uuid) {
-        return this.mapper.toDto(findById(uuid));
+    public DTO findByIdAndReturnDto(ID id) {
+        return this.mapper.toDto(findById(id));
     }
 
     @Override
@@ -91,8 +91,8 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
 
     @Transactional
     @Override
-    public T updateById(UUID uuid, T entity) {
-        T databaseEntity = findById(uuid);
+    public T updateById(ID id, T entity) {
+        T databaseEntity = findById(id);
         this.mapper.copyProperties(entity, databaseEntity);
         update(databaseEntity);
         return databaseEntity;
@@ -100,8 +100,8 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
 
     @Transactional
     @Override
-    public DTO updateByIdAndReturnDto(UUID uuid, T entity) {
-        return this.mapper.toDto(updateById(uuid, entity));
+    public DTO updateByIdAndReturnDto(ID id, T entity) {
+        return this.mapper.toDto(updateById(id, entity));
     }
 
     @Transactional
@@ -111,8 +111,8 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
 
     @Transactional
     @Override
-    public void deleteById(UUID uuid) {
-        T entity = this.repository.findByIdOptional(uuid).orElseThrow(() -> new NotFoundException("Entity not found"));
+    public void deleteById(ID id) {
+        T entity = this.repository.findByIdOptional(id).orElseThrow(() -> new NotFoundException("Entity not found"));
         try {
             repository.getEntityManager().remove(entity);
             repository.getEntityManager().flush();
@@ -123,40 +123,40 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
 
     @Transactional
     @Override
-    public T activateById(UUID uuid) {
-        boolean exists = existsById(uuid);
+    public T activateById(ID id) {
+        boolean exists = existsById(id);
         if (!exists) {
             throw new NotFoundException("Entidade não encontrada");
         }
-        repository.activeById(uuid);
-        return findById(uuid);
+        repository.activeById(id);
+        return findById(id);
     }
 
     @Transactional
     @Override
-    public DTO activateByIdAndReturnDto(UUID uuid) {
-        return this.mapper.toDto(activateById(uuid));
+    public DTO activateByIdAndReturnDto(ID id) {
+        return this.mapper.toDto(activateById(id));
     }
 
     @Transactional
     @Override
-    public T disableById(UUID uuid) {
-        boolean exists = existsById(uuid);
+    public T disableById(ID id) {
+        boolean exists = existsById(id);
         if (!exists) {
             throw new NotFoundException("Entidade não encontrada");
         }
-        repository.desactiveById(uuid);
-        return findById(uuid);
+        repository.desactiveById(id);
+        return findById(id);
     }
 
     @Transactional
     @Override
-    public DTO disableByIdAndReturnDto(UUID uuid) {
-        return this.mapper.toDto(disableById(uuid));
+    public DTO disableByIdAndReturnDto(ID id) {
+        return this.mapper.toDto(disableById(id));
     }
 
     @Override
-    public boolean existsById(UUID id) {
+    public boolean existsById(ID id) {
         return this.repository.existsById(id);
     }
 
@@ -171,7 +171,7 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
     }
 
     @Override
-    public List<Revision<T>> findAllRevisions(UUID entityId) {
+    public List<Revision<T>> findAllRevisions(ID entityId) {
         AuditReader reader = AuditReaderFactory.get(repository.getEntityManager());
         List<Number> revisionsNumbers = reader.getRevisions(entityClass, entityId);
         List<Revision<T>> revisionList = new ArrayList<>();
@@ -190,7 +190,7 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
     }
 
     @Override
-    public RevisionComparison<T> compareWithPreviousRevision(UUID entityId, Integer revisionId) {
+    public RevisionComparison<T> compareWithPreviousRevision(ID entityId, Integer revisionId) {
         AuditReader auditReader = AuditReaderFactory.get(repository.getEntityManager());
 
         // Obtém todas as revisões para a entidade
@@ -230,7 +230,7 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
     }
 
     @Override
-    public List<RevisionComparison<T>> findAllRevisionsComparisons(UUID entityId) {
+    public List<RevisionComparison<T>> findAllRevisionsComparisons(ID entityId) {
         AuditReader auditReader = AuditReaderFactory.get(repository.getEntityManager());
         List<Number> revisionsNumbers = auditReader.getRevisions(entityClass, entityId);
 
@@ -274,7 +274,6 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
 
             AuditFieldLabel annotation = field.getAnnotation(AuditFieldLabel.class);
             String label = field.getName();
-            boolean ignore = false;
             int order = 0;
 
             if (annotation != null) {
@@ -340,7 +339,7 @@ public abstract class BaseService<T extends BaseEntity, DTO, UUID, R extends Rep
     }
 
     @SuppressWarnings("unchecked")
-    private RevisionType getRevisionType(AuditReader auditReader, UUID entityId, Number revisionId) {
+    private RevisionType getRevisionType(AuditReader auditReader, ID entityId, Number revisionId) {
         List<Object[]> revisionData = auditReader.createQuery()
                 .forRevisionsOfEntity(entityClass, false, true)
                 .add(AuditEntity.id().eq(entityId))
