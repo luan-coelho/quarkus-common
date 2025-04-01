@@ -23,10 +23,15 @@ public class UserModuleAccess extends BaseEntity {
     @ManyToOne
     private Module module;
 
+    @ManyToOne
+    private Company company;
+
+    @ManyToOne
+    private NaturalPerson naturalPerson;
+
     @Column(name = "access_start_date")
     private LocalDate accessStartDate;
 
     @Column(name = "access_end_date")
     private LocalDate accessEndDate;
-
 }

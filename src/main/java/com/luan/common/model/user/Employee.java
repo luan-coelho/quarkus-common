@@ -14,6 +14,8 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,17 +23,22 @@ import lombok.Setter;
 @Setter
 @Entity
 @Audited
-@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "employees", uniqueConstraints = {
         @UniqueConstraint(name = "pk_employee", columnNames = { "employee_id" }),
 })
-public abstract class Employee extends BaseEntity {
+public class Employee extends BaseEntity {
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToMany
     @JoinTable(name = "employee_company", joinColumns = @JoinColumn(name = "employee_id"), inverseJoinColumns = @JoinColumn(name = "company_id"))
     private List<Company> companies;
 
+    @Enumerated(EnumType.STRING)
+    private EmployeeType type; // ADMIN ou REGULAR
+
+    private String position;
+    private String department;
 }

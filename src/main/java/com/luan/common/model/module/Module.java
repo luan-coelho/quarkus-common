@@ -9,6 +9,7 @@ import org.hibernate.type.SqlTypes;
 import com.luan.common.annotation.AuditFieldLabel;
 import com.luan.common.model.user.BaseEntity;
 import com.luan.common.model.user.User;
+import com.luan.common.model.user.Company;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,7 +25,7 @@ import lombok.Setter;
 @Setter
 @Audited
 @Entity
-@Table(name = "module", uniqueConstraints = {
+@Table(name = "modules", uniqueConstraints = {
                 @UniqueConstraint(name = "pk_module", columnNames = { "module_id" }),
 })
 public class Module extends BaseEntity {
@@ -47,4 +48,7 @@ public class Module extends BaseEntity {
         @ManyToMany(mappedBy = "modules")
         private List<User> users;
 
+        @ManyToMany
+        @JoinTable(name = "company_module", joinColumns = @JoinColumn(name = "module_id"), inverseJoinColumns = @JoinColumn(name = "company_id"))
+        private List<Company> companies;
 }

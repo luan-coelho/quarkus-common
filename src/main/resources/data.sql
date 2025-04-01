@@ -1,15 +1,15 @@
 CREATE SCHEMA IF NOT EXISTS audit;
 
 -- Inserir módulo
-INSERT INTO module (active, version, created_at, updated_at, id, name)
+INSERT INTO modules (active, version, created_at, updated_at, id, name)
 VALUES (true, 0, NOW(), NOW(), '123e4567-e89b-12d3-a456-426614174000', 'Gestão - Segurança');
 
 -- Menu Item: Relatórios
-INSERT INTO menu_item (active, version, created_at, updated_at, id, icon, label, route)
+INSERT INTO menu_items (active, version, created_at, updated_at, id, icon, label, route)
 VALUES (true, 0, NOW(), NOW(), '223e4567-e89b-12d3-a456-426614174001', 'puzzle', 'Módulos', '/modules');
 
 -- Menu Item: Relatórios
-INSERT INTO menu_item (active, version, created_at, updated_at, id, icon, label, route)
+INSERT INTO menu_items (active, version, created_at, updated_at, id, icon, label, route)
 VALUES (true, 0, NOW(), NOW(), '08695e2e-1794-49b5-97d1-c75f02c6d42c', 'square-menu', 'Itens de Menu',
         '/menu-items');
 

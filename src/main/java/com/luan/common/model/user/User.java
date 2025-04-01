@@ -30,7 +30,7 @@ public class User extends BaseEntity {
         private LocalDate accessEndDate;
 
         @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-        @JoinColumn(name = "user_id", referencedColumnName = "user_id", foreignKey = @ForeignKey(name = "fk_user_address"))
+        @JoinColumn(name = "address_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_user_address"))
         private Address address;
 
         @ElementCollection(targetClass = Role.class)
@@ -43,4 +43,9 @@ public class User extends BaseEntity {
         @JoinTable(name = "user_module", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "module_id"))
         private List<Module> modules;
 
+        @OneToOne(mappedBy = "user")
+        private Employee employee;
+
+        @OneToOne(mappedBy = "user")
+        private NaturalPerson naturalPerson;
 }

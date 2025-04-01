@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
+import com.luan.common.dto.user.CreateNaturalPersonDto;
 import com.luan.common.dto.user.naturalperson.NaturalPersonResponseDto;
 import com.luan.common.mapper.BaseMapper;
 import com.luan.common.mapper.QuarkusMappingConfig;
@@ -25,5 +26,7 @@ public interface NaturalPersonMapper extends BaseMapper<NaturalPerson, NaturalPe
 
     @Override
     DataPagination<NaturalPersonResponseDto> toDto(DataPagination<NaturalPerson> target);
+
+    NaturalPerson toEntity(CreateNaturalPersonDto source);
 
 }

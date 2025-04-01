@@ -24,7 +24,9 @@ public class Address extends BaseEntity {
     private String number;
     private String complement;
 
-    @OneToOne
+    @OneToOne(mappedBy = "address")
     private User user;
 
+    @OneToOne(mappedBy = "address")
+    private Company company;
 }
